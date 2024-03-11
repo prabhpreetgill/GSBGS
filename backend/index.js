@@ -11,7 +11,7 @@ app.use(
       "https://gsbgs.vercel.app",
       "http://localhost:3000",
     ],
-    methods: ["POST", "GET", "PUT"],
+    methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true,
   })
 );

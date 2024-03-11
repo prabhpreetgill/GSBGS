@@ -33,17 +33,17 @@ export default function StudentForm({ studentId }) {
           );
           if (!response.ok) throw new Error("Student data fetch failed");
           const data = await response.json();
-          setFirstName(data.firstName);
-          setMiddleName(data.middleName);
-          setLastName(data.lastName);
-          setEmail(data.email);
-          setPhoneNumber(data.phoneNumber);
-          setpFname(data.pFname);
-          setpMname(data.pMname);
-          setpLname(data.pLname);
-          setpEmail(data.pEmail);
-          setpPhone(data.pPhone);
-          setPaid(data.paid);
+          setFirstName(data._firstName);
+          setMiddleName(data._middleName);
+          setLastName(data._lastName);
+          setEmail(data._email);
+          setPhoneNumber(data._phoneNumber);
+          setpFname(data._pFname);
+          setpMname(data._pMname);
+          setpLname(data._pLname);
+          setpEmail(data._pEmail);
+          setpPhone(data._pPhone);
+          setPaid(data._paid);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -52,6 +52,29 @@ export default function StudentForm({ studentId }) {
       fetchStudentData();
     }
   }, [studentId]);
+
+  async function deleteStudent() {
+    try {
+      const response = await fetch(`https://gsbgs-backend.vercel.app/api/students/${studentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        console.log('Student successfully deleted.');
+        // You can update the UI here, for example, by removing the student from the displayed list
+      } else {
+        console.error('Failed to delete student.');
+        // Handle failure, possibly by showing an error message to the user
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+  
 
   const handleSubmit = async () => {
     const newStudent = new Student(
@@ -74,9 +97,9 @@ export default function StudentForm({ studentId }) {
 
     try {
       const response = await fetch(
-        "https://gsbgs-backend.vercel.app/api/students/add",
+        `https://gsbgs-backend.vercel.app/api/students/${studentId}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -86,11 +109,10 @@ export default function StudentForm({ studentId }) {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("Student added:", result);
+        console.log("Student Updated:", result);
         // Handle success (e.g., show success message, clear form)
-        setMessage(`Enrolled ${firstName} into GSB`);
+        setMessage(`Updated ${firstName}`);
         triggerSnackbar();
-        setEmpty();
       } else {
         // Handle errors (e.g., show error message)
         const errorResult = await response.json();
@@ -107,19 +129,7 @@ export default function StudentForm({ studentId }) {
     // Assuming you have a method in TransitionsSnackbar to trigger the snackbar
   };
 
-  function setEmpty() {
-    setFirstName("");
-    setMiddleName("");
-    setLastName("");
-    setEmail("");
-    setPhoneNumber("");
-    setpFname("");
-    setpMname("");
-    setpLname("");
-    setpEmail("");
-    setpPhone("");
-    setPaid(false);
-  }
+ 
 
   return (
     <React.Fragment>
@@ -211,7 +221,7 @@ export default function StudentForm({ studentId }) {
                   background: "#F73c3f",
                 },
               }}
-              onClick={handleSubmit} // Set onClick to the function reference
+              onClick={deleteStudent} // Set onClick to the function reference
             >
               Delete
             </Button>
