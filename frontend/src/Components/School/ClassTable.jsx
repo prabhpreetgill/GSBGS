@@ -31,6 +31,7 @@ export default function TableMaker(url) {
 
   const [open, setOpen] = React.useState(false); // Controls the Dialog (Modal) Open/Close
   const [name, setName] = React.useState("");
+  const [className, setClassName] = React.useState("");
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controls Snackbar Open/Close
   const [message, setMessage] = React.useState(""); // Stores the Snackbar Message
@@ -68,6 +69,7 @@ export default function TableMaker(url) {
 
   const handleRowClick = (classes) => {
     setName(classes);
+    setClassName(classes._name)
     setOpen(true);
   };
 
@@ -124,8 +126,7 @@ export default function TableMaker(url) {
 
   const handleSubmit = async () => {
 
-    const updateTa = new ClassesOffered(name._name);
-    console.log(name._id)
+    const updateTa = new ClassesOffered(className);
 
     const triggerSnackbar = () => {
       setSnackbarOpen(true);
@@ -133,7 +134,7 @@ export default function TableMaker(url) {
 
     try {
       const response = await fetch(
-        `https://gsbgs-backend.vercel.app/api/classesoffered/${name._id}`,
+        `https://gsbgs-backend.vercel.app/api/classesoffered/update/${name._id}`,
         {
           method: "PUT",
           headers: {
@@ -254,8 +255,8 @@ export default function TableMaker(url) {
         <DialogContent>
           {Text({
             label: "Class Name",
-            onChange: (e) => setName(e.target.value),
-            value: name._name,
+            onChange: (e) => setClassName(e.target.value),
+            value: className,
           })}
           <Box sx={{ ...buttonStyle, justifyContent: "space-evenly" }}>
             <Button

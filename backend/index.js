@@ -196,6 +196,35 @@ app.post("/api/term/add", async (req, res) => {
   }
 });
 
+app.put("/api/term/update/:id", async (req, res) => {
+    try {
+      const termID = req.params.id;
+      const updateData = req.body;
+  
+      const db = await client.db("GSIMS");
+      const collection = await db.collection("Term");
+  
+      // Ensure teacherId is a valid ObjectId
+      if (!ObjectId.isValid(termID)) {
+        return res.status(400).json({ message: "Invalid term ID" });
+      }
+  
+      const result = await collection.updateOne(
+        { _id: new ObjectId(termID) },
+        { $set: updateData }
+      );
+  
+      if (result.modifiedCount > 0) {
+        res.status(200).json({ message: "Term updated successfully" });
+      } else {
+        res.status(404).json({ message: "Term not found or no changes made" });
+      }
+    } catch (error) {
+      console.error("Error updating term:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
 app.get("/api/teacher", async (req, res) => {
   try {
     const db = await client.db("GSIMS");
