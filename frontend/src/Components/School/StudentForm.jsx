@@ -52,29 +52,36 @@ export default function StudentForm({ studentId }) {
       fetchStudentData();
     }
   }, [studentId]);
+  const triggerSnackbar = () => {
+    setSnackbarOpen(true);
+  };
 
   async function deleteStudent() {
     try {
-      const response = await fetch(`https://gsbgs-backend.vercel.app/api/students/${studentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-  
+      const response = await fetch(
+        `https://gsbgs-backend.vercel.app/api/students/${studentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
-        console.log('Student successfully deleted.');
+        console.log("Student successfully deleted.");
+        setMessage(`Deleted ${firstName}`);
+        triggerSnackbar();
         // You can update the UI here, for example, by removing the student from the displayed list
       } else {
-        console.error('Failed to delete student.');
+        console.error("Failed to delete student.");
         // Handle failure, possibly by showing an error message to the user
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       // Handle network errors or other exceptions
     }
   }
-  
 
   const handleSubmit = async () => {
     const newStudent = new Student(
@@ -90,10 +97,6 @@ export default function StudentForm({ studentId }) {
       pPhone,
       paid
     );
-
-    const triggerSnackbar = () => {
-      setSnackbarOpen(true);
-    };
 
     try {
       const response = await fetch(
@@ -129,15 +132,13 @@ export default function StudentForm({ studentId }) {
     // Assuming you have a method in TransitionsSnackbar to trigger the snackbar
   };
 
- 
-
   return (
     <React.Fragment>
       <CssBaseline />
       <Container
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >
-        <Box sx={containerStyle}>
+        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
           <Typography variant="h4" sx={titleStyle}>
             Personal
           </Typography>
@@ -266,19 +267,7 @@ const buttonStyle = {
   padding: "10px", // Padding for each row
 };
 
-const containerStyle = {
-  bgcolor: "rgba(255, 255, 252, 0.95)",
-  height: "auto",
-  borderRadius: "25px",
-  boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  backgroundSize: "cover",
-  backgroundRepeat: "no-repeat",
-  width: { xs: "80vw", lg: "50vw" },
-  padding: "20px", // Added padding
-};
+
 
 const titleStyle = {
   marginBottom: "20px",

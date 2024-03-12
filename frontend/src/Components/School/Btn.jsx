@@ -9,8 +9,8 @@ import {
   useTheme,
   Typography,
 } from "@mui/material";
-import Table from "./Table";
-import PropTypes from "prop-types";
+ import PropTypes from "prop-types";
+import StudentTable from "./StudentTable";
 
 function Btn({ label }) {
   // Correct way to handle click event
@@ -78,7 +78,7 @@ function Btn({ label }) {
         >
           All Students
         </DialogTitle>
-        <DialogContent>{Table("students")}</DialogContent>
+        <DialogContent>{StudentTable("students")}</DialogContent>
         <DialogActions sx={{ display: "flex", justifyContent: "left" }}>
           <Button autoFocus onClick={handleClose}>
             Close

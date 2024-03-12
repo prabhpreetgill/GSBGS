@@ -19,7 +19,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import { Teacher } from "../../Scripts/personel";
+import { TA } from "../../Scripts/personel";
 import TransitionsSnackbar from "../Enroll/Submit";
 import Text from "../Enroll/Text";
 
@@ -62,10 +62,10 @@ export default function TableMaker(url) {
     setSnackbarOpen(true);
   };
 
-  async function deleteTeacher() {
+  async function deleteTA() {
     try {
       const response = await fetch(
-        `https://gsbgs-backend.vercel.app/api/teacher/${selectedPerson._id}`,
+        `https://gsbgs-backend.vercel.app/api/ta/${selectedPerson._id}`,
         {
           method: "DELETE",
           headers: {
@@ -147,7 +147,7 @@ export default function TableMaker(url) {
     setOpen(false);
   };
 
-  const updateTeacher = new Teacher(firstName, middleName, lastName, email, phoneNumber);
+  const updateTa = new TA(firstName, middleName, lastName, email, phoneNumber);
 
   const handleSubmit = async () => {
 
@@ -157,13 +157,13 @@ export default function TableMaker(url) {
 
     try {
       const response = await fetch(
-        `https://gsbgs-backend.vercel.app/api/teacher/update/${selectedPerson._id}`,
+        `https://gsbgs-backend.vercel.app/api/ta/update/${selectedPerson._id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(updateTeacher),
+          body: JSON.stringify(updateTa),
         }
       );
 
@@ -266,7 +266,7 @@ export default function TableMaker(url) {
         }}
       >
         <DialogTitle sx={{ textAlign: "center", fontSize: "3rem" }}>
-          Teacher
+          TA
         </DialogTitle>
         <DialogContent>
           <Box sx={rowStyle}>
@@ -309,7 +309,7 @@ export default function TableMaker(url) {
                   background: "#F73c3f",
                 },
               }}
-              onClick={deleteTeacher} // Set onClick to the function reference
+              onClick={deleteTA} // Set onClick to the function reference
             >
               Delete
             </Button>

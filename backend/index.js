@@ -331,6 +331,35 @@ app.delete('/api/ta/:id', async (req, res) => {
     }
 });
 
+app.put("/api/ta/update/:id", async (req, res) => {
+    try {
+      const taId = req.params.id;
+      const updateData = req.body;
+  
+      const db = await client.db("GSIMS");
+      const collection = await db.collection("TA");
+  
+      // Ensure teacherId is a valid ObjectId
+      if (!ObjectId.isValid(taId)) {
+        return res.status(400).json({ message: "Invalid ta ID" });
+      }
+  
+      const result = await collection.updateOne(
+        { _id: new ObjectId(taId) },
+        { $set: updateData }
+      );
+  
+      if (result.modifiedCount > 0) {
+        res.status(200).json({ message: "TA updated successfully" });
+      } else {
+        res.status(404).json({ message: "TA not found or no changes made" });
+      }
+    } catch (error) {
+      console.error("Error updating teacher:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
 app.get("/api/classesoffered", async (req, res) => {
   try {
     const db = await client.db("GSIMS");

@@ -10,7 +10,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import Table from "./Table";
+import Table from "./TaTable";
 import Text from "../Enroll/Text";
 import { TA } from "../../Scripts/personel";
 import TransitionsSnackbar from "../Enroll/Submit";
