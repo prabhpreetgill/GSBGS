@@ -413,6 +413,36 @@ app.delete('/api/classesoffered/:id', async (req, res) => {
     }
 });
 
+app.put("/api/classesoffered/update/:id", async (req, res) => {
+    try {
+      const classID = req.params.id;
+      const updateData = req.body;
+  
+      const db = await client.db("GSIMS");
+      const collection = await db.collection("ClassesOffered");
+  
+      // Ensure teacherId is a valid ObjectId
+      if (!ObjectId.isValid(classID)) {
+        return res.status(400).json({ message: "Invalid Class ID" });
+      }
+  
+      const result = await collection.updateOne(
+        { _id: new ObjectId(classID) },
+        { $set: updateData }
+      );
+  
+      if (result.modifiedCount > 0) {
+        res.status(200).json({ message: "Class updated successfully" });
+      } else {
+        res.status(404).json({ message: "Class not found or no changes made" });
+      }
+    } catch (error) {
+      console.error("Error updating Class:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+
 app.get("/api/classes", async (req, res) => {
   try {
     const db = await client.db("GSIMS");
@@ -504,7 +534,7 @@ app.put("/api/classes/update/:id", async (req, res) => {
 });
 
 // DELETE a class
-app.delete('/api/classes//:id', async (req, res) => {
+app.delete('/api/classes/:id', async (req, res) => {
     const classId = req.params.id;
     if (!ObjectId.isValid(classId)) {
         return res.status(400).json({ message: "Invalid Class ID" });
