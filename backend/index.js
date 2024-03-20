@@ -276,6 +276,33 @@ async function run() {
       }
     });
 
+    app.get("/api/teacher/:id", async (req, res) => {
+      try {
+        // Extract the ID from the request parameters
+        const teacherId = req.params.id;
+
+        // Connect to the database and select the collection
+        const db = await client.db("GSIMS");
+        const collection = await db.collection("Teachers");
+
+        // Convert string ID to MongoDB ObjectId
+        const objectId = new ObjectId(teacherId);
+
+        // Find the document with the matching ID
+        const teacher = await collection.findOne({ _id: objectId });
+
+        // If a teacher is found, return it, otherwise return a 404 error
+        if (teacher) {
+          res.json(teacher);
+        } else {
+          res.status(404).json({ message: "Teacher not found" });
+        }
+      } catch (error) {
+        console.error("Error fetching teacher by ID:", error);
+        res.status(500).json({ message: error.message });
+      }
+    });
+
     app.post("/api/teacher/add", async (req, res) => {
       try {
         const teacherData = req.body; // Get student data from the request body

@@ -248,7 +248,7 @@ export default function TableMaker({ url }) {
                   hover
                   role="checkbox"
                   tabIndex={-1}
-                  key={row.id}
+                  key={row._id}
                   onClick={() => handleRowClick(row)}
                   style={{ cursor: "pointer" }} // Optional: change cursor on hover
                 >

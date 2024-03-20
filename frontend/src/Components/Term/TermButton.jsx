@@ -22,13 +22,11 @@ function CurrentTerm() {
         setCurrentTerms(current);
         setPrevTerms(previous);
 
-        console.log(currentTerms[0]._id);
-
         // Set label for previous terms section
         setPrevious(previous.length > 0 ? "Previous Terms" : "");
       })
       .catch((error) => console.error("Error:", error));
-  }, [currentTerms]);
+  }, []);
 
   let navigate = useNavigate();
 

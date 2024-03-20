@@ -48,7 +48,7 @@ export default function ClassTable(url) {
         setData(data);
       })
       .catch((error) => console.error("Error:", error));
-  }, refreshTrigger);
+  }, [refreshTrigger]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -189,10 +189,10 @@ export default function ClassTable(url) {
           <TableHead
             sx={{ background: "grey", borderBottom: "2px solid black" }}
           >
-            <TableRow>
-              {columns.map((column) => (
+            <TableRow key={1}>
+              {columns.map((column, index) => (
                 <TableCell
-                  key={column.id}
+                  key={index}
                   style={{ minWidth: column.minWidth }}
                 >
                   {column.label}
@@ -203,12 +203,12 @@ export default function ClassTable(url) {
           <TableBody>
             {filteredData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
+              .map((row, index) => (
                 <TableRow
                   hover
                   role="checkbox"
                   tabIndex={-1}
-                  key={row.id}
+                  key={index}
                   onClick={() => handleRowClick(row)}
                   style={{ cursor: "pointer" }} // Optional: change cursor on hover
                 >

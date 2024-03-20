@@ -14,7 +14,6 @@ import DayPicker from "./DayPicker";
 import ClassText from "./ClassText";
 import { Classes } from "../../Scripts/school";
 import { useParams } from "react-router-dom";
-import { Teacher } from "../../Scripts/personel";
 
 function AddClass() {
   // State Hooks
@@ -50,72 +49,78 @@ function AddClass() {
 
   const Term = useParams();
 
+  
+
   // Function to Handle Form Submission
   const handleSubmit = async () => {
-    // Create or fetch the class as needed; assuming newClass is ready for this example
     const newClass = new Classes(className._name, day, [], [], []);
-
-    // Update class teacher info as you've done; assuming classTeacher is ready
-    const classTeacher = Teacher.fromTeacher(teacher);
-    console.log(classTeacher)
-    const teacherInfo = classTeacher.teacherInfo();
-    classTeacher.assignClasses(className._name);
-
-    newClass.assignTeacher(teacherInfo);
-    newClass.assignTA(ta);
+    newClass.assignTeacher(teacher._id);
+    newClass.assignTA(ta._id);
 
     try {
-      // Firstly, attempt to add or update the class itself
-      // Assuming this operation returns the newly created or updated class with its ID
+      // Add the new class
       const classResponse = await fetch(
         `https://gsbgs-backend.vercel.app/api/classes/add`,
         {
-          method: "POST", // Use POST for creating, PUT for updating
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newClass),
         }
       );
+      if (!classResponse.ok) throw new Error("Failed to add new class.");
 
-      if (classResponse.ok) {
-        const classData = await classResponse.json();
-        // Once the class is successfully added or updated, fetch the current term
-        const termResponse = await fetch(
-          `https://gsbgs-backend.vercel.app/api/term/${Term._termID}`
-        );
-        if (termResponse.ok) {
-          const termData = await termResponse.json();
-          // Add the new class's ID to the term's classes array
-          const updatedClasses = [...termData.classes, classData._id];
-          // Update the term with the new classes array
-          const termUpdateResponse = await fetch(
-            `https://gsbgs-backend.vercel.app/api/term/update/${Term._termID}`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ...termData, classes: updatedClasses }),
-            }
-          );
+      const classData = await classResponse.json();
 
-          if (termUpdateResponse.ok) {
-            setMessage(
-              `Added Class ${className._name} to Term ${Term._termID}`
-            );
-          } else {
-            throw new Error("Failed to update term with new class.");
-          }
-        } else {
-          throw new Error("Failed to fetch term data.");
+      // Fetch and update the current term with the new class's ID
+      const termResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/term/${Term.termId}`
+      );
+      if (!termResponse.ok) throw new Error("Failed to fetch term data.");
+
+      const termData = await termResponse.json();
+      const updatedClassesForTerm = [...termData._classes, classData._id];
+
+      const termUpdateResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/term/update/${Term.termId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _classes: updatedClassesForTerm }),
         }
-      } else {
-        throw new Error("Failed to add new class.");
-      }
+      );
+      if (!termUpdateResponse.ok)
+        throw new Error("Failed to update term with new class.");
+
+      // Fetch the teacher, update their _classes array, and update the teacher in the database
+      const teacherResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/teacher/${teacher._id}`
+      );
+      if (!teacherResponse.ok) throw new Error("Failed to fetch teacher data.");
+
+      const teacherData = await teacherResponse.json();
+      const updatedClassesForTeacher = [...teacherData._classes, classData._id];
+
+      const teacherUpdateResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/teacher/update/${teacher._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _classes: updatedClassesForTeacher }),
+        }
+      );
+      if (!teacherUpdateResponse.ok)
+        throw new Error("Failed to update teacher with new class.");
+
+      setMessage(
+        `Added Class ${className._name} to Term ${termData._name} and updated Teacher ${teacher._id}`
+      );
     } catch (error) {
       console.error("Error in operations:", error);
       setMessage(error.message || "An unexpected error occurred.");
     } finally {
       triggerSnackbar();
-      setEmpty(); // Reset Form Fields
-      setOpen(false); // Close Dialog after Submission
+      setEmpty();
+      setOpen(false);
     }
   };
 
@@ -127,6 +132,7 @@ function AddClass() {
   const handleTaChange = (event, newValue) => {
     // Assuming newValue is the selected TA object or identifier
     setTa(newValue);
+    console.log(teacher);
   };
 
   const handleClassChange = (event, newClass) => {
