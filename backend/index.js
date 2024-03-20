@@ -225,6 +225,31 @@ app.put("/api/term/update/:id", async (req, res) => {
     }
   });
 
+  app.get("/api/term/:id", async (req, res) => {
+    try {
+      const termId = req.params.id; // Get the term ID from the request parameters
+  
+      const db = await client.db("GSIMS");
+      const collection = await db.collection("Term");
+  
+      // Convert string ID to ObjectId for MongoDB
+      const { ObjectId } = require('mongodb');
+      const objectId = new ObjectId(termId);
+  
+      const termDocument = await collection.findOne({ _id: objectId });
+  
+      if (termDocument) {
+        res.status(200).json(termDocument);
+      } else {
+        // If no document found, send a 404 response
+        res.status(404).json({ message: "Term not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching Term by ID:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });  
+
 app.get("/api/teacher", async (req, res) => {
   try {
     const db = await client.db("GSIMS");

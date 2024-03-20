@@ -22,11 +22,14 @@ import DialogActions from "@mui/material/DialogActions";
 import { Teacher } from "../../Scripts/personel";
 import TransitionsSnackbar from "../Enroll/Submit";
 import Text from "../Enroll/Text";
+import PropTypes from "prop-types";
 
-export default function TableMaker(url) {
+export default function TableMaker({ url }) {
+  // Ensure url is received as a prop
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // Corrected syntax for setting initial state
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPerson, setselectedPerson] = useState({});
   const [open, setOpen] = React.useState(false); // Controls the Dialog (Modal) Open/Close
@@ -40,6 +43,8 @@ export default function TableMaker(url) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controls Snackbar Open/Close
   const [message, setMessage] = React.useState(""); // Stores the Snackbar Message
 
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -50,13 +55,34 @@ export default function TableMaker(url) {
   ];
 
   useEffect(() => {
-    fetch("https://gsbgs-backend.vercel.app/api/" + url)
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data);
-      })
-      .catch((error) => console.error("Error:", error));
-  }, []);
+    async function fetchData() {
+      try {
+        const response = await fetch(
+          `https://gsbgs-backend.vercel.app/api/${url}`
+        );
+        const result = await response.json();
+        setData(result);
+        // Assuming initial filtering isn't required or is handled elsewhere
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
+    fetchData();
+  }, [url, refreshTrigger]);
+
+  // Function to handle search filtering
+  useEffect(() => {
+    const lowercasedQuery = searchQuery.toLowerCase();
+    const filtered = data.filter(
+      (item) =>
+        item._firstName.toLowerCase().includes(lowercasedQuery) ||
+        item._middleName.toLowerCase().includes(lowercasedQuery) ||
+        item._lastName.toLowerCase().includes(lowercasedQuery)
+    );
+
+    setFilteredData(filtered);
+  }, [data, searchQuery]);
 
   const triggerSnackbar = () => {
     setSnackbarOpen(true);
@@ -103,17 +129,6 @@ export default function TableMaker(url) {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  const filteredData = data.filter((row) => {
-    const firstName = row["_firstName"]?.toLowerCase() || "";
-    const middleName = row["_middleName"]?.toLowerCase() || "";
-    const lastName = row["_lastName"]?.toLowerCase() || "";
-    return (
-      firstName.includes(searchQuery) ||
-      middleName.includes(searchQuery) ||
-      lastName.includes(searchQuery)
-    );
-  });
-
   const handleRowClick = (student) => {
     setselectedPerson(student);
     setFirstName(student._firstName);
@@ -121,7 +136,6 @@ export default function TableMaker(url) {
     setLastName(student._lastName);
     setEmail(student._email);
     setPhoneNumber(student._phoneNumber);
-    console.log(firstName)
     setOpen(true);
   };
 
@@ -147,10 +161,17 @@ export default function TableMaker(url) {
     setOpen(false);
   };
 
-  const updateTeacher = new Teacher(firstName, middleName, lastName, email, phoneNumber);
+  const updateTeacher = new Teacher(
+    firstName,
+    middleName,
+    lastName,
+    email,
+    phoneNumber
+  );
+
+  const triggerRefresh = () => setRefreshTrigger((prev) => !prev);
 
   const handleSubmit = async () => {
-
     const triggerSnackbar = () => {
       setSnackbarOpen(true);
     };
@@ -184,6 +205,7 @@ export default function TableMaker(url) {
       console.error("Network error:", error);
       // Handle network errors
     }
+    triggerRefresh();
     setOpen(false);
   };
 
@@ -326,8 +348,7 @@ export default function TableMaker(url) {
             </Button>
           </Box>
         </DialogContent>
-        <DialogActions
-        >
+        <DialogActions>
           <Button autoFocus onClick={handleSubmit}>
             Close
           </Button>
@@ -345,7 +366,7 @@ export default function TableMaker(url) {
 // Common style for rows
 const rowStyle = {
   display: "flex",
-  flexDirection: {xs: 'column', lg: "row"},
+  flexDirection: { xs: "column", lg: "row" },
   justifyContent: "space-between", // Space items evenly
   width: "90%", // Full width
   padding: "10px", // Padding for each row
@@ -357,4 +378,9 @@ const buttonStyle = {
   flexDirection: "row",
   justifyContent: { xs: "center", lg: "right" }, // Space items evenly
   padding: "10px", // Padding for each row
+};
+
+// Prop validation
+TableMaker.propTypes = {
+  url: PropTypes.string.isRequired,
 };

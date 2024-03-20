@@ -50,78 +50,86 @@ function AddClass() {
 
   const Term = useParams();
 
-
   // Function to Handle Form Submission
   const handleSubmit = async () => {
-    const newClass = new Classes(className._name, day, Term._termID, [], [], []);
+    // Create or fetch the class as needed; assuming newClass is ready for this example
+    const newClass = new Classes(className._name, day, [], [], []);
 
+    // Update class teacher info as you've done; assuming classTeacher is ready
     const classTeacher = Teacher.fromTeacher(teacher);
+    console.log(classTeacher)
     const teacherInfo = classTeacher.teacherInfo();
-    classTeacher.assignClasses(newClass);
-
+    classTeacher.assignClasses(className._name);
 
     newClass.assignTeacher(teacherInfo);
     newClass.assignTA(ta);
 
-    const id = teacher._id.toString();
-    
     try {
-      const response = await fetch("https://gsbgs-backend.vercel.app/api/classes/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newClass),
-      });
+      // Firstly, attempt to add or update the class itself
+      // Assuming this operation returns the newly created or updated class with its ID
+      const classResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/classes/add`,
+        {
+          method: "POST", // Use POST for creating, PUT for updating
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newClass),
+        }
+      );
 
-      // Ensure the class is added before updating the teacher
-      if (response.ok) {
-        // const classData = await response.json();
-
-        // Fetch teacher ID and Update Teacher
-        // Note: Ensure that teacher._id is available and correct
-        if (teacher && id) {
-          const updateResponse = await fetch(
-            `https://gsbgs-backend.vercel.app/api/teacher/update/${id}`,
+      if (classResponse.ok) {
+        const classData = await classResponse.json();
+        // Once the class is successfully added or updated, fetch the current term
+        const termResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/term/${Term._termID}`
+        );
+        if (termResponse.ok) {
+          const termData = await termResponse.json();
+          // Add the new class's ID to the term's classes array
+          const updatedClasses = [...termData.classes, classData._id];
+          // Update the term with the new classes array
+          const termUpdateResponse = await fetch(
+            `https://gsbgs-backend.vercel.app/api/term/update/${Term._termID}`,
             {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(classTeacher),
+              body: JSON.stringify({ ...termData, classes: updatedClasses }),
             }
           );
 
-          if (updateResponse.ok) {
-            const updatedTeacher = await updateResponse.json();
-            setMessage(`Added Class ${className._name}`);
-            console.log("Updated Teacher:", updatedTeacher);
+          if (termUpdateResponse.ok) {
+            setMessage(
+              `Added Class ${className._name} to Term ${Term._termID}`
+            );
           } else {
-            throw new Error("Failed to update teacher");
+            throw new Error("Failed to update term with new class.");
           }
         } else {
-          throw new Error("Teacher ID is not available");
+          throw new Error("Failed to fetch term data.");
         }
-
-        triggerSnackbar();
-        setEmpty(); // Reset Form Fields
       } else {
-        throw new Error("Failed to add new class");
+        throw new Error("Failed to add new class.");
       }
     } catch (error) {
       console.error("Error in operations:", error);
-      setMessage(error.message);
+      setMessage(error.message || "An unexpected error occurred.");
+    } finally {
       triggerSnackbar();
+      setEmpty(); // Reset Form Fields
+      setOpen(false); // Close Dialog after Submission
     }
-
-    setOpen(false); // Close Dialog after Submission
   };
 
-  const handleTeacherChange = (_, newTeacher) => {
-    setTeacher(newTeacher);
+  const handleTeacherChange = (event, newValue) => {
+    // Assuming newValue is the selected teacher object or identifier
+    setTeacher(newValue);
   };
 
-  const handleTaChange = (_, newTa) => {
-    setTa(newTa);
+  const handleTaChange = (event, newValue) => {
+    // Assuming newValue is the selected TA object or identifier
+    setTa(newValue);
   };
 
-  const handleClassChange = (_, newClass) => {
+  const handleClassChange = (event, newClass) => {
     setClassName(newClass);
   };
 
@@ -136,51 +144,51 @@ function AddClass() {
         display: "flex",
         width: "85vw",
         justifyContent: "right",
-        alignItems: "center",      
+        alignItems: "center",
       }}
     >
-        <Button
-          variant="contained"
-          sx={{
-            padding: "10px 50px",
-            marginBottom: "20px",
-            background: "rgba(115,134,222,1)",
-            fontWeight: "",
-            "&:hover": {
-              // Styles to apply on hover
-              background: "rgba(148,215,202, 1)",
-              color: "black",
-              fontWeight: "bold",
-              // You can add more styles here
-            },
-          }}
-          onClick={handleClickOpen}
-        >
-          Add Class
-        </Button>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Add Class</DialogTitle>
-          <DialogContent>
-            <ClassText
-              url="classesoffered"
-              label="Class Name"
-              value={className}
-              onChange={handleClassChange}
-            />
-            <Text
-              url="teacher"
-              label="Teacher"
-              value={teacher}
-              onChange={handleTeacherChange}
-            />
-            <Text url="ta" label="TA" value={ta} onChange={handleTaChange} />
-            <DayPicker onChange={handleDayChange} value={day} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSubmit}>Submit</Button>
-          </DialogActions>
-        </Dialog>
+      <Button
+        variant="contained"
+        sx={{
+          padding: "10px 50px",
+          marginBottom: "20px",
+          background: "rgba(115,134,222,1)",
+          fontWeight: "",
+          "&:hover": {
+            // Styles to apply on hover
+            background: "rgba(148,215,202, 1)",
+            color: "black",
+            fontWeight: "bold",
+            // You can add more styles here
+          },
+        }}
+        onClick={handleClickOpen}
+      >
+        Add Class
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Add Class</DialogTitle>
+        <DialogContent>
+          <ClassText
+            url="classesoffered"
+            label="Class Name"
+            value={className}
+            onChange={handleClassChange}
+          />
+          <Text
+            url="teacher"
+            label="Teacher"
+            value={teacher}
+            onChange={handleTeacherChange}
+          />
+          <Text url="ta" label="TA" value={ta} onChange={handleTaChange} />
+          <DayPicker onChange={handleDayChange} value={day} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleSubmit}>Submit</Button>
+        </DialogActions>
+      </Dialog>
       <TransitionsSnackbar
         open={snackbarOpen}
         setOpen={setSnackbarOpen}

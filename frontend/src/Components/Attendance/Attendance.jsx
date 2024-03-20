@@ -1,83 +1,129 @@
-import React from "react";
-import "../../App.css"; // Global styles
-import Sidebar from "../Sidebar/Sidebar"; // Sidebar component
-import { Box } from "@mui/material"; // MUI component for layout
+import React, { useState, useEffect } from "react";
+import "../../App.css";
+import Sidebar from "../Sidebar/Sidebar";
+import { Box, Pagination, Typography } from "@mui/material";
+import ClassesContainer from "./Classses";
 
 function Attendance() {
-  const sidebarWidth = "150px"; // Set the width of the sidebar
-
-  const [currentTerms, setCurrentTerms] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  let weeks = 0;
+  const sidebarWidth = "150px";
+  const [currentTerms, setCurrentTerms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [weeksInfo, setWeeksInfo] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch terms on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     fetch("https://gsbgs-backend.vercel.app/api/term")
       .then((response) => response.json())
       .then((data) => {
         const today = new Date();
-
-        // Filter current and previous terms based on end date
         const current = data.filter((term) => new Date(term._end) >= today);
         setCurrentTerms(current);
         setLoading(false);
-        console.log(current)
       })
       .catch((error) => console.error("Error:", error));
   }, []);
 
   function calculateWeeksBetween(startDate, endDate) {
-    // Convert input strings to Date objects
     const start = new Date(startDate);
     const end = new Date(endDate);
-  
-    // Check if dates are valid
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return "Invalid date(s)";
+    const oneWeek = 1000 * 60 * 60 * 24 * 7; // milliseconds in one week
+    const weeks = [];
+    const options = { month: "long", day: "numeric" }; // Formatting options
+
+    for (let i = 0; start.getTime() + oneWeek * i <= end.getTime(); i++) {
+      const weekStart = new Date(start.getTime() + oneWeek * i);
+      let weekEnd = new Date(weekStart.getTime() + oneWeek);
+
+      if (weekEnd > end) weekEnd = end;
+
+      weeks.push({
+        weekNumber: i + 1,
+        startDate: weekStart.toLocaleDateString("en-US", options),
+        endDate: weekEnd.toLocaleDateString("en-US", options),
+        rawStartDate: weekStart, // Keep the raw Date for calculations
+        rawEndDate: weekEnd, // Keep the raw Date for calculations
+      });
     }
-  
-    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
-    const differenceInDays = Math.abs((end - start) / oneDay);
-    return Math.ceil(differenceInDays / 7);
+
+    return weeks;
   }
 
-  if(!loading){
-    weeks = calculateWeeksBetween(currentTerms[0]._start, currentTerms[0]._end);
-    console.log(weeks)
-  }
+  // Adjust this effect to calculate the current week number as the initial page
+  useEffect(() => {
+    if (!loading && currentTerms.length > 0) {
+      const weeks = calculateWeeksBetween(
+        currentTerms[0]._start,
+        currentTerms[0]._end
+      );
+      setWeeksInfo(weeks);
+
+      const today = new Date();
+      const currentWeekIndex = weeks.findIndex(
+        (week) => week.rawStartDate <= today && today <= week.rawEndDate // Use raw Date objects for comparison
+      );
+      setCurrentPage(currentWeekIndex + 1); // Set the current page based on the index found
+    }
+  }, [loading, currentTerms]);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   return (
     <div className="background">
-      {" "}
-      {/* Background styling from App.css */}
       <Box sx={{ height: "100vh" }}>
-        {" "}
-        {/* Full viewport height container */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            width: `calc(100% - ${sidebarWidth})`, // Width adjusted for sidebar
-            marginLeft: sidebarWidth, // Margin to accommodate sidebar
+            width: {xs: '100%', lg: `calc(99% - ${sidebarWidth})`},
+            marginLeft: {xs: 0, lg: sidebarWidth},
           }}
         >
-          <Sidebar /> {/* Sidebar component */}
-          <Box
-            sx={{
-              display: "flex",
-              margin: "25px",
-            }}
-          >
-          </Box>
-          {weeks}
-          <Box
-            sx={{
-              display: "flex",
-              margin: "25px",
-              flexDirection: "column",
-            }}
-          >
-          </Box>
+          <Sidebar />
+          {loading ? (
+            <Box>Loading...</Box>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "25px",
+              }}
+            >
+              <Box sx={{ margin: "10px" }}>
+                <Typography textAlign={"center"} sx={{ fontSize: "4rem" }}>
+                  Week {currentPage}
+                </Typography>
+                <Typography textAlign={"center"} sx={{ fontSize: "2rem" }}>
+                  {weeksInfo[currentPage - 1]?.startDate} to{" "}
+                  {weeksInfo[currentPage - 1]?.endDate}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column", // Use column for vertical centering of internal items if needed
+                  alignItems: "center", // Center items horizontally in the container
+                  justifyContent: "center", // Center items vertically if flexDirection is column
+                  padding: 2
+                }}
+              >
+                <ClassesContainer week={currentPage} />
+              </Box>
+              <Pagination
+                count={weeksInfo.length}
+                page={currentPage}
+                onChange={handlePageChange}
+                variant="outlined"
+                shape="rounded"
+                color="primary"
+              />
+            </Box>
+          )}
         </Box>
       </Box>
     </div>

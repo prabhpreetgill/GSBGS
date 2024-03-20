@@ -78,7 +78,9 @@ function Btn({ label }) {
         >
           All Students
         </DialogTitle>
-        <DialogContent>{StudentTable("students")}</DialogContent>
+        <DialogContent>
+          <StudentTable url="students"/>
+        </DialogContent>
         <DialogActions sx={{ display: "flex", justifyContent: "left" }}>
           <Button autoFocus onClick={handleClose}>
             Close

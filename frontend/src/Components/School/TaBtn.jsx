@@ -29,6 +29,7 @@ function TaBtn({ label }) {
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controls Snackbar Open/Close
   const [message, setMessage] = React.useState(""); // Stores the Snackbar Message
+  
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -150,7 +151,7 @@ function TaBtn({ label }) {
           Teacher Assistants
         </DialogTitle>
         <DialogContent>
-          {Table("ta")}
+          <Table url="ta"/>
           <Dialog
             fullScreen={fullScreen}
             open={open1}

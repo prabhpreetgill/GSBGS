@@ -1,16 +1,16 @@
 class Term {
-  constructor(name, start, end) {
+  constructor(name, start, end, classes) {
     this._name = name;
     this._start = start;
     this._end = end;
-    this._classes = [];
+    this._classes = classes;
   }
 
   fromTerm(Term){
     this._name = Term.name;
     this._start = Term.start;
     this._end = Term.end;
-    this._classes = [];
+    this._classes = Term._classes;
   }
 
   get name() {
@@ -44,17 +44,16 @@ class Term {
 }
 
 class Classes {
-  constructor(name, day, term, students, teachers, TAs) {
+  constructor(name, day, students, teachers, TAs) {
     this._name = name;
     this._day = day;
-    this._term = term;
     this._students = students;
     this._teachers = teachers;
     this._TAs = TAs;
   }
   
   static fromClasses(classObj){
-    return new Classes(classObj._name, classObj._day, classObj._term, classObj._students, classObj._teachers, classObj._TAs)
+    return new Classes(classObj._name, classObj._day, classObj._students, classObj._teachers, classObj._TAs)
   }
 
   get name() {
@@ -69,13 +68,6 @@ class Classes {
   }
   set day(value) {
     this._day = value;
-  }
-
-  get term() {
-    return this._term;
-  }
-  set term(value) {
-    this._term = value;
   }
 
   get students() {

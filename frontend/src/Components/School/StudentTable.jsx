@@ -19,9 +19,10 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import StudentForm from "./StudentForm";
+import PropTypes from 'prop-types';
 
 
-export default function StudentTable(url) {
+export default function StudentTable({url}) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState([]);
@@ -60,7 +61,7 @@ export default function StudentTable(url) {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  const filteredData = data.filter((row) => {
+  const filteredData = data?.filter((row) => {
     const firstName = row["_firstName"]?.toLowerCase() || "";
     const middleName = row["_middleName"]?.toLowerCase() || "";
     const lastName = row["_lastName"]?.toLowerCase() || "";
@@ -170,3 +171,7 @@ export default function StudentTable(url) {
     </Paper>
   );
 }
+
+StudentTable.propTypes = {
+  url: PropTypes.string.isRequired,
+};

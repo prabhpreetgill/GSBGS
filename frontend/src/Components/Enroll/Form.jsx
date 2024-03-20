@@ -36,7 +36,8 @@ export default function SimpleContainer() {
       pLname,
       pEmail,
       pPhone,
-      paid
+      paid,
+      []
     );
     console.log(newStudent);
 
@@ -92,7 +93,7 @@ export default function SimpleContainer() {
   }
 
   return (
-    <React.Fragment>
+    <Box>
       <CssBaseline />
       <Container
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
@@ -165,9 +166,9 @@ export default function SimpleContainer() {
             </Box>
             <Divider sx={dividerStyle} />
               <Typography variant="h4" sx={titleStyle}>
-                Paid?
+                Payment Plan
               </Typography>
-            <Box sx={rowStyle}>
+            <Box sx={{...rowStyle, justifyContent: 'center'}}>
                 <Dropdown
                   value={paid}
                   onChange={(e) => setPaid(e.target.value)}
@@ -189,7 +190,7 @@ export default function SimpleContainer() {
         setOpen={setSnackbarOpen}
         alert={message}
       />
-    </React.Fragment>
+    </Box>
   );
 }
 

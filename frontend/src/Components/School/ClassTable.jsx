@@ -23,7 +23,7 @@ import { ClassesOffered } from "../../Scripts/school";
 
 const columns = [{ id: "_name", label: "Name", minWidth: 170 }];
 
-export default function TableMaker(url) {
+export default function ClassTable(url) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState([]);
@@ -35,6 +35,7 @@ export default function TableMaker(url) {
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controls Snackbar Open/Close
   const [message, setMessage] = React.useState(""); // Stores the Snackbar Message
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   const triggerSnackbar = () => {
     setSnackbarOpen(true);
@@ -47,7 +48,7 @@ export default function TableMaker(url) {
         setData(data);
       })
       .catch((error) => console.error("Error:", error));
-  });
+  }, refreshTrigger);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -62,7 +63,7 @@ export default function TableMaker(url) {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  const filteredData = data.filter((row) => {
+  const filteredData = data?.filter((row) => {
     const name = row["_name"]?.toLowerCase() || "";
     return name.includes(searchQuery);
   });
@@ -76,6 +77,9 @@ export default function TableMaker(url) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const triggerRefresh = () => setRefreshTrigger(prev => !prev);
+
 
   // Empty data check
   if (!data || data.length === 0) {
@@ -146,6 +150,7 @@ export default function TableMaker(url) {
 
       if (response.ok) {
         const result = await response.json();
+        triggerRefresh();
         console.log("Student added:", result);
         // Handle success (e.g., show success message, clear form)
         setMessage(`Updated ${name._name}`);

@@ -42,6 +42,7 @@ export default function PermanentDrawerLeft() {
           { name: "Home", url: "/" },
           { name: "Enroll", url: "/enroll" },
           { name: "Attendance", url: "/attendance" },
+          { name: "Finance", url: "/finance" },
           { name: "Term", url: "/term" },
           { name: "School", url: "/school" },
         ].map((item) => (

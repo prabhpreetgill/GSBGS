@@ -22,8 +22,11 @@ import DialogActions from "@mui/material/DialogActions";
 import { TA } from "../../Scripts/personel";
 import TransitionsSnackbar from "../Enroll/Submit";
 import Text from "../Enroll/Text";
+import PropTypes from "prop-types";
 
-export default function TableMaker(url) {
+
+export default function TaTable({url}) {
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState([]);
@@ -39,6 +42,7 @@ export default function TableMaker(url) {
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controls Snackbar Open/Close
   const [message, setMessage] = React.useState(""); // Stores the Snackbar Message
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -56,11 +60,13 @@ export default function TableMaker(url) {
         setData(data);
       })
       .catch((error) => console.error("Error:", error));
-  }, []);
+  }, [url, refreshTrigger]);
 
   const triggerSnackbar = () => {
     setSnackbarOpen(true);
   };
+
+  const triggerRefresh = () => setRefreshTrigger((prev) => !prev);
 
   async function deleteTA() {
     try {
@@ -103,7 +109,7 @@ export default function TableMaker(url) {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  const filteredData = data.filter((row) => {
+  const filteredData = data?.filter((row) => {
     const firstName = row["_firstName"]?.toLowerCase() || "";
     const middleName = row["_middleName"]?.toLowerCase() || "";
     const lastName = row["_lastName"]?.toLowerCase() || "";
@@ -112,7 +118,7 @@ export default function TableMaker(url) {
       middleName.includes(searchQuery) ||
       lastName.includes(searchQuery)
     );
-  });
+  }, [refreshTrigger]);
 
   const handleRowClick = (student) => {
     setselectedPerson(student);
@@ -121,7 +127,6 @@ export default function TableMaker(url) {
     setLastName(student._lastName);
     setEmail(student._email);
     setPhoneNumber(student._phoneNumber);
-    console.log(firstName)
     setOpen(true);
   };
 
@@ -150,7 +155,6 @@ export default function TableMaker(url) {
   const updateTa = new TA(firstName, middleName, lastName, email, phoneNumber);
 
   const handleSubmit = async () => {
-
     const triggerSnackbar = () => {
       setSnackbarOpen(true);
     };
@@ -184,6 +188,7 @@ export default function TableMaker(url) {
       console.error("Network error:", error);
       // Handle network errors
     }
+    triggerRefresh();
     setOpen(false);
   };
 
@@ -326,8 +331,7 @@ export default function TableMaker(url) {
             </Button>
           </Box>
         </DialogContent>
-        <DialogActions
-        >
+        <DialogActions>
           <Button autoFocus onClick={handleSubmit}>
             Close
           </Button>
@@ -345,7 +349,7 @@ export default function TableMaker(url) {
 // Common style for rows
 const rowStyle = {
   display: "flex",
-  flexDirection: {xs: 'column', lg: "row"},
+  flexDirection: { xs: "column", lg: "row" },
   justifyContent: "space-between", // Space items evenly
   width: "90%", // Full width
   padding: "10px", // Padding for each row
@@ -357,4 +361,9 @@ const buttonStyle = {
   flexDirection: "row",
   justifyContent: { xs: "center", lg: "right" }, // Space items evenly
   padding: "10px", // Padding for each row
+};
+
+// Prop validation
+TaTable.propTypes = {
+  url: PropTypes.string.isRequired,
 };

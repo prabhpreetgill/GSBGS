@@ -46,7 +46,7 @@ function AddTerm() {
   const handleSubmit = async () => {
     const start = new Date(startDate.$y, startDate.$M, startDate.$D);
     const end = new Date(endDate.$y, endDate.$M, endDate.$D);
-    const newTerm = new Term(termName, start, end); // Creating new Term object
+    const newTerm = new Term(termName, start, end, []); // Creating new Term object
 
     try {
       // API Call to Add Term

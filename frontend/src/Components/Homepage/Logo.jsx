@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import Logo from "../../public/logo.jpeg";
+import Logo from "../../public/logo.jpeg"; // Ensure this path is correct
 import React from "react";
 
 function HomeLogo() {
@@ -7,19 +7,22 @@ function HomeLogo() {
     <Box
       sx={{
         boxSizing: "border-box", // Ensures padding and border are included in the width
-        width: "100vw",
+        width: "100%", // Use 100% to ensure it respects the container's width
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        paddingBottom: '20px'
+        paddingBottom: '20px',
       }}
     >
       <Box
         component="img"
-        sx={{ sr: { Logo }, width: {xs: '90vw', lg: "70vw"} }}
+        sx={{
+          maxWidth: { xs: '90%', lg: "70%" }, // Adjusted for responsive design
+          height: "auto", // Ensures the aspect ratio is maintained
+        }}
         src={Logo}
         alt="Logo"
-      ></Box>
+      />
     </Box>
   );
 }

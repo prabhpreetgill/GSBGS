@@ -63,7 +63,8 @@ function TeacherBtn({ label }) {
       email,
       phoneNumber
     );
-    console.log(newStudent);
+    newStudent.classes = [];
+    newStudent.attendance = [];
 
     const triggerSnackbar = () => {
       setSnackbarOpen(true);
@@ -113,8 +114,8 @@ function TeacherBtn({ label }) {
         variant="outlined"
         sx={{
           padding: "10px 50px",
-          width: {xs: "80vw", lg: "20vw"},
-          height: {xs: "13vh",lg: "20vh"},
+          width: { xs: "80vw", lg: "20vw" },
+          height: { xs: "13vh", lg: "20vh" },
           display: "flex",
           justifyContent: "space-around",
           borderRadius: "30px",
@@ -122,7 +123,7 @@ function TeacherBtn({ label }) {
             "url(https://img.freepik.com/premium-vector/nice-abstract-pastel-color-abstract-background-used-wallpaper-dicorective-templates-design_293525-380.jpg)",
           backgroundSize: "cover",
           border: "none",
-          margin: {xs: 2, lg: 10},
+          margin: { xs: 2, lg: 10 },
           transitionDuration: "0.2s",
           "&:hover": {
             boxShadow: "rgba(0, 0, 0, 0.45) 0px 5px 15px",
@@ -132,7 +133,11 @@ function TeacherBtn({ label }) {
         }}
         onClick={handleClickOpen}
       >
-        <Typography color="black" fontWeight="bold" sx={{fontSize: {xs: '2.5rem', lg: "3rem"}}} >
+        <Typography
+          color="black"
+          fontWeight="bold"
+          sx={{ fontSize: { xs: "2.5rem", lg: "3rem" } }}
+        >
           {label}
         </Typography>
       </Button>
@@ -143,7 +148,7 @@ function TeacherBtn({ label }) {
         aria-labelledby="responsive-dialog-title"
         sx={{
           "& .MuiDialog-paper": {
-            width: {xs: '90vw', lg: "50%"},
+            width: { xs: "90vw", lg: "50%" },
             height: "80%",
             maxHeight: "100vh",
             maxWidth: "100vw",
@@ -157,7 +162,7 @@ function TeacherBtn({ label }) {
           Teachers
         </DialogTitle>
         <DialogContent>
-          {Table("teacher")}
+          <Table url="teacher" />
           <Dialog
             fullScreen={fullScreen}
             open={open1}

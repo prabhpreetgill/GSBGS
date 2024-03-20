@@ -9,13 +9,15 @@ function Enroll() {
 
   return (
     <div className="background">
-      <Box sx={{ height: "100vh" }}>
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             width: {xs: '100vw', lg: `calc(100% - ${sidebarWidth})`}, // Dynamically calculate width
             marginLeft: {xs: '0' ,lg: sidebarWidth},
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh'
           }}
         >
           <Sidebar />
@@ -23,12 +25,12 @@ function Enroll() {
             sx={{
               display: "flex",
               margin: "25px",
+
             }}
           >
             <Form />
           </Box>
         </Box>
-      </Box>
     </div>
   );
 }

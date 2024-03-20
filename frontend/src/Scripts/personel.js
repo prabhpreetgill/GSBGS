@@ -1,11 +1,13 @@
 class Person {
-    constructor(firstName, middleName, lastName, email, phoneNumber) {
-      this._firstName = firstName;
-      this._middleName = middleName || "";
-      this._lastName = lastName;
-      this._email = email;
-      this._phoneNumber = phoneNumber;
-    }
+  constructor(firstName, middleName, lastName, email, phoneNumber, classes, attendance) {
+    this.firstName = firstName;
+    this.middleName = middleName || "";
+    this.lastName = lastName;
+    this.email = email;
+    this.phoneNumber = phoneNumber;
+    this.classes = classes || []; // Ensure defaults are set
+    this.attendance = attendance || []; // Ensure defaults are set
+  }
   
     // Getters
     get firstName() { return this._firstName; }
@@ -28,10 +30,8 @@ class Person {
   
 
   class TA extends Person {
-    constructor(firstName, middleName, lastName, email, phoneNumber) {
-      super(firstName, middleName, lastName, email, phoneNumber);
-      this._classes = [];
-      this._attendance = [];
+    constructor(firstName, middleName, lastName, email, phoneNumber, classes, attendance) {
+      super(firstName, middleName, lastName, email, phoneNumber, classes, attendance);
     }
   
     // Getters
@@ -45,12 +45,16 @@ class Person {
     assignClasses(classObj) {
       this._classes.push(classObj);
     }
+
+    addAttendance(classId, date, status) {
+      this._attendance.push({ classId, date, status });
+    }
   }
   
 
   class Teacher extends TA {
-    constructor(firstName, middleName, lastName, email, phoneNumber) {
-      super(firstName, middleName, lastName, email, phoneNumber);
+    constructor(firstName, middleName, lastName, email, phoneNumber, classes, attendance) {
+      super(firstName, middleName, lastName, email, phoneNumber, classes, attendance);
     }
   
     static fromTeacher(teacherObj) {
@@ -73,33 +77,32 @@ class Person {
 
 // Class representing a Student, extending from Person
 class Student extends Person {
-    constructor(firstName, middleName, lastName, email, phoneNumber, parentFname, parentMname, parentLname, parentPhone, parentEmail, paid) {
-      super(firstName, middleName, lastName, email, phoneNumber);
+    constructor(firstName, middleName, lastName, email, phoneNumber, parentFname, parentMname, parentLname, parentPhone, parentEmail, paymentPlan, attendance) {
+      super(firstName, middleName, lastName, email, phoneNumber, attendance);
       this._parentFname = parentFname;
       this._parentMname = parentMname || "";
       this._parentLname = parentLname;
       this._parentPhone = parentPhone;
       this._parentEmail = parentEmail;
-      this._paid = paid;
-      this._attendance = [];
+      this.paymentPlan = paymentPlan;
     }
   
-    // Getters and Setters for student-specific properties
-    get parentFname() { return this._parentFname; }
-    get parentMname() { return this._parentMname; }
-    get parentLname() { return this._parentLname; }
-    get parentPhone() { return this._parentPhone; }
-    get parentEmail() { return this._parentEmail; }
-    get paid() { return this._paid; }
-    get attendance() { return this._attendance; }
+    // // Getters and Setters for student-specific properties
+    // get parentFname() { return this._parentFname; }
+    // get parentMname() { return this._parentMname; }
+    // get parentLname() { return this._parentLname; }
+    // get parentPhone() { return this._parentPhone; }
+    // get parentEmail() { return this._parentEmail; }
+    // get paid() { return this._paid; }
+    // get attendance() { return this._attendance; }
   
-    set parentFname(value) { this._parentFname = value; }
-    set parentMname(value) { this._parentMname = value; }
-    set parentLname(value) { this._parentLname = value; }
-    set parentPhone(value) { this._parentPhone = value; }
-    set parentEmail(value) { this._parentEmail = value; }
-    set paid(value) { this._paid = value; }
-    set attendance(value) { this._attendance = value; }
+    // set parentFname(value) { this._parentFname = value; }
+    // set parentMname(value) { this._parentMname = value; }
+    // set parentLname(value) { this._parentLname = value; }
+    // set parentPhone(value) { this._parentPhone = value; }
+    // set parentEmail(value) { this._parentEmail = value; }
+    // set paymentPlan(value) { this.paymentPlan = value; }
+    // set attendance(value) { this._attendance = value; }
   
     getParentName() {
       return `${this._parentFname} ${this._parentMname} ${this._parentLname}`.trim();
@@ -114,6 +117,10 @@ class Student extends Person {
         email: this.email,
         phoneNumber: this.phoneNumber
       };
+    }
+
+    addAttendance(classId, date, status) {
+      this._attendance.push({ classId, date, status });
     }
   }
   
