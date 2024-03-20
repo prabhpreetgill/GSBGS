@@ -395,6 +395,35 @@ async function run() {
       }
     });
 
+    app.get("/api/ta/:id", async (req, res) => {
+      try {
+        // Extract the ID from the request parameters
+        const taId = req.params.id;
+    
+        // Connect to the database
+        const db = await client.db("GSIMS");
+        const collection = db.collection("TA");
+    
+        // Convert string ID to ObjectId for MongoDB
+        const objectId = new ObjectId(taId);
+    
+        // Find the TA document by ID
+        const taDocument = await collection.findOne({ _id: objectId });
+    
+        if (taDocument) {
+          // If the document is found, send it back in the response
+          res.status(200).json(taDocument);
+        } else {
+          // If no document is found, send a 404 response
+          res.status(404).json({ message: "TA not found" });
+        }
+      } catch (error) {
+        console.error("Error retrieving TA by ID:", error);
+        res.status(500).json({ message: error.message });
+      }
+    });
+    
+
     app.post("/api/ta/add", async (req, res) => {
       try {
         const taData = req.body; // Get student data from the request body

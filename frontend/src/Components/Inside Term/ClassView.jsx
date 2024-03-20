@@ -6,35 +6,36 @@ export default function ClassView(url) {
   const [data, setData] = useState([]);
   const [teacherName, setTeacherName] = useState("");
   const [taName, setTaName] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if(url != undefined){
-        const response = await fetch(
-          `https://gsbgs-backend.vercel.app/api/classes/${url}`
-        );
-        const data = await response.json();
-        setData(data);
-        setLoading(false);
+    const fetchClassDetails = async () => {
+      if (url) {
+        try {
+          const classResponse = await fetch(`https://gsbgs-backend.vercel.app/api/classes/${url}`);
+          const classData = await classResponse.json();
+          setData(classData);
+  
+          if (classData._teachers && classData._teachers.length > 0) {
+            const teacherResponse = await fetch(`https://gsbgs-backend.vercel.app/api/teacher/${classData._teachers[0]}`);
+            const teacherData = await teacherResponse.json();
+            setTeacherName(`${teacherData._firstName} ${teacherData._middleName} ${teacherData._lastName}`);
+          }
+  
+          if (classData._TAs && classData._TAs.length > 0) {
+            const taResponse = await fetch(`https://gsbgs-backend.vercel.app/api/ta/${classData._TAs[0]}`);
+            const taData = await taResponse.json();
+            setTaName(`${taData._firstName} ${taData._middleName} ${taData._lastName}`);
+          }
+  
+        } catch (error) {
+          console.error("Error:", error);
         }
-      } catch (error) {
-        console.error("Error:", error);
       }
     };
-
-    fetchData();
-
-    if (!loading) {
-      setTeacherName(
-        `${data?._teachers[0].firstName} ${data?._teachers[0].middleName} ${data?._teachers[0].lastName}`
-      );
-      setTaName(
-        `${data?._TAs[0]._firstName} ${data?._TAs[0]._middleName} ${data?._TAs[0]._lastName}`
-      );
-    }
+  
+    fetchClassDetails();
   }, [url]); // Only re-run the effect if url changes
+  
 
   // Empty data check
   if (!data || data.length === 0) {

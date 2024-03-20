@@ -112,7 +112,7 @@ function AddClass() {
         throw new Error("Failed to update teacher with new class.");
 
       setMessage(
-        `Added Class ${className._name} to Term ${termData._name} and updated Teacher ${teacher._id}`
+        `Added Class ${className._name} to Term ${termData._name}`
       );
     } catch (error) {
       console.error("Error in operations:", error);
