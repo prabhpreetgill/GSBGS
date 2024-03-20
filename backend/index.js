@@ -27,6 +27,7 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
 // Connect to MongoDB once at the start of the application
 async function run() {
   try {
@@ -58,50 +59,50 @@ app.get("/api/students", async (req, res) => {
 });
 
 app.get("/api/students/:id", async (req, res) => {
-    try {
-        const studentId = req.params.id; // Get the student ID from the URL parameter
+  try {
+    const studentId = req.params.id; // Get the student ID from the URL parameter
 
-        const db = await client.db("GSIMS");
-        const collection = await db.collection("Students");
+    const db = await client.db("GSIMS");
+    const collection = await db.collection("Students");
 
-        const student = await collection.findOne({ _id: new ObjectId(studentId) });
+    const student = await collection.findOne({ _id: new ObjectId(studentId) });
 
-        if (!student) {
-            return res.status(404).json({ message: "Student not found" });
-        }
-        console.log("found student")
-        res.json(student);
-    } catch (error) {
-        console.error("Error fetching student:", error);
-        res.status(500).json({ message: error.message });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
     }
+    console.log("found student");
+    res.json(student);
+  } catch (error) {
+    console.error("Error fetching student:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
-
 app.put("/api/students/:id", async (req, res) => {
-    try {
-      const studentId = req.params.id; // Get the student ID from the URL parameter
-      const updateData = req.body; // Get the update data from the request body
-  
-      const db = await client.db("GSIMS");
-      const collection = await db.collection("Students");
-  
-      const result = await collection.updateOne(
-        { _id: new ObjectId(studentId) }, // Ensure to match by the correct ID
-        { $set: updateData } // Use $set to update the fields in the document
-      );
-  
-      if (result.modifiedCount === 0) {
-        return res.status(404).json({ message: "Student not found or no update made" });
-      }
-  
-      res.json({ message: "Student updated successfully" });
-    } catch (error) {
-      console.error("Error updating student:", error);
-      res.status(500).json({ message: error.message });
+  try {
+    const studentId = req.params.id; // Get the student ID from the URL parameter
+    const updateData = req.body; // Get the update data from the request body
+
+    const db = await client.db("GSIMS");
+    const collection = await db.collection("Students");
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(studentId) }, // Ensure to match by the correct ID
+      { $set: updateData } // Use $set to update the fields in the document
+    );
+
+    if (result.modifiedCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "Student not found or no update made" });
     }
-  });
-  
+
+    res.json({ message: "Student updated successfully" });
+  } catch (error) {
+    console.error("Error updating student:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 app.post("/api/students/add", async (req, res) => {
   try {
@@ -197,33 +198,33 @@ app.post("/api/term/add", async (req, res) => {
 });
 
 app.put("/api/term/update/:id", async (req, res) => {
-    try {
-      const termID = req.params.id;
-      const updateData = req.body;
-  
-      const db = await client.db("GSIMS");
-      const collection = await db.collection("Term");
-  
-      // Ensure teacherId is a valid ObjectId
-      if (!ObjectId.isValid(termID)) {
-        return res.status(400).json({ message: "Invalid term ID" });
-      }
-  
-      const result = await collection.updateOne(
-        { _id: new ObjectId(termID) },
-        { $set: updateData }
-      );
-  
-      if (result.modifiedCount > 0) {
-        res.status(200).json({ message: "Term updated successfully" });
-      } else {
-        res.status(404).json({ message: "Term not found or no changes made" });
-      }
-    } catch (error) {
-      console.error("Error updating term:", error);
-      res.status(500).json({ message: error.message });
+  try {
+    const termID = req.params.id;
+    const updateData = req.body;
+
+    const db = await client.db("GSIMS");
+    const collection = await db.collection("Term");
+
+    // Ensure teacherId is a valid ObjectId
+    if (!ObjectId.isValid(termID)) {
+      return res.status(400).json({ message: "Invalid term ID" });
     }
-  });
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(termID) },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount > 0) {
+      res.status(200).json({ message: "Term updated successfully" });
+    } else {
+      res.status(404).json({ message: "Term not found or no changes made" });
+    }
+  } catch (error) {
+    console.error("Error updating term:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 app.get("/api/teacher", async (req, res) => {
   try {
@@ -291,20 +292,22 @@ app.put("/api/teacher/update/:id", async (req, res) => {
 });
 
 // DELETE a teacher
-app.delete('/api/teacher/:id', async (req, res) => {
-    const teacherId = req.params.id;
-    if (!ObjectId.isValid(teacherId)) {
-        return res.status(400).json({ message: "Invalid Teacher ID" });
-    }
-    try {
-        const db = await client.db("GSIMS");
-        const collection = db.collection("Teachers");
-        const result = await collection.deleteOne({ _id: new ObjectId(teacherId) });
-        result.deletedCount === 1 ? res.status(200).json({ message: "Teacher successfully deleted" }) : res.status(404).json({ message: "Teacher not found" });
-    } catch (error) {
-        console.error('Error deleting teacher:', error);
-        res.status(500).json({ message: error.message });
-    }
+app.delete("/api/teacher/:id", async (req, res) => {
+  const teacherId = req.params.id;
+  if (!ObjectId.isValid(teacherId)) {
+    return res.status(400).json({ message: "Invalid Teacher ID" });
+  }
+  try {
+    const db = await client.db("GSIMS");
+    const collection = db.collection("Teachers");
+    const result = await collection.deleteOne({ _id: new ObjectId(teacherId) });
+    result.deletedCount === 1
+      ? res.status(200).json({ message: "Teacher successfully deleted" })
+      : res.status(404).json({ message: "Teacher not found" });
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 app.get("/api/ta", async (req, res) => {
@@ -344,50 +347,52 @@ app.post("/api/ta/add", async (req, res) => {
 });
 
 // DELETE a TA
-app.delete('/api/ta/:id', async (req, res) => {
-    const taId = req.params.id;
-    if (!ObjectId.isValid(taId)) {
-        return res.status(400).json({ message: "Invalid TA ID" });
-    }
-    try {
-        const db = await client.db("GSIMS");
-        const collection = db.collection("TA");
-        const result = await collection.deleteOne({ _id: new ObjectId(taId) });
-        result.deletedCount === 1 ? res.status(200).json({ message: "TA successfully deleted" }) : res.status(404).json({ message: "TA not found" });
-    } catch (error) {
-        console.error('Error deleting TA:', error);
-        res.status(500).json({ message: error.message });
-    }
+app.delete("/api/ta/:id", async (req, res) => {
+  const taId = req.params.id;
+  if (!ObjectId.isValid(taId)) {
+    return res.status(400).json({ message: "Invalid TA ID" });
+  }
+  try {
+    const db = await client.db("GSIMS");
+    const collection = db.collection("TA");
+    const result = await collection.deleteOne({ _id: new ObjectId(taId) });
+    result.deletedCount === 1
+      ? res.status(200).json({ message: "TA successfully deleted" })
+      : res.status(404).json({ message: "TA not found" });
+  } catch (error) {
+    console.error("Error deleting TA:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 app.put("/api/ta/update/:id", async (req, res) => {
-    try {
-      const taId = req.params.id;
-      const updateData = req.body;
-  
-      const db = await client.db("GSIMS");
-      const collection = await db.collection("TA");
-  
-      // Ensure teacherId is a valid ObjectId
-      if (!ObjectId.isValid(taId)) {
-        return res.status(400).json({ message: "Invalid ta ID" });
-      }
-  
-      const result = await collection.updateOne(
-        { _id: new ObjectId(taId) },
-        { $set: updateData }
-      );
-  
-      if (result.modifiedCount > 0) {
-        res.status(200).json({ message: "TA updated successfully" });
-      } else {
-        res.status(404).json({ message: "TA not found or no changes made" });
-      }
-    } catch (error) {
-      console.error("Error updating teacher:", error);
-      res.status(500).json({ message: error.message });
+  try {
+    const taId = req.params.id;
+    const updateData = req.body;
+
+    const db = await client.db("GSIMS");
+    const collection = await db.collection("TA");
+
+    // Ensure teacherId is a valid ObjectId
+    if (!ObjectId.isValid(taId)) {
+      return res.status(400).json({ message: "Invalid ta ID" });
     }
-  });
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(taId) },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount > 0) {
+      res.status(200).json({ message: "TA updated successfully" });
+    } else {
+      res.status(404).json({ message: "TA not found or no changes made" });
+    }
+  } catch (error) {
+    console.error("Error updating teacher:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 app.get("/api/classesoffered", async (req, res) => {
   try {
@@ -426,51 +431,54 @@ app.post("/api/classesoffered/add", async (req, res) => {
 });
 
 // DELETE a class offered
-app.delete('/api/classesoffered/:id', async (req, res) => {
-    const classOfferedId = req.params.id;
-    if (!ObjectId.isValid(classOfferedId)) {
-        return res.status(400).json({ message: "Invalid Class Offered ID" });
-    }
-    try {
-        const db = await client.db("GSIMS");
-        const collection = db.collection("ClassesOffered");
-        const result = await collection.deleteOne({ _id: new ObjectId(classOfferedId) });
-        result.deletedCount === 1 ? res.status(200).json({ message: "Class Offered successfully deleted" }) : res.status(404).json({ message: "Class Offered not found" });
-    } catch (error) {
-        console.error('Error deleting class offered:', error);
-        res.status(500).json({ message: error.message });
-    }
+app.delete("/api/classesoffered/:id", async (req, res) => {
+  const classOfferedId = req.params.id;
+  if (!ObjectId.isValid(classOfferedId)) {
+    return res.status(400).json({ message: "Invalid Class Offered ID" });
+  }
+  try {
+    const db = await client.db("GSIMS");
+    const collection = db.collection("ClassesOffered");
+    const result = await collection.deleteOne({
+      _id: new ObjectId(classOfferedId),
+    });
+    result.deletedCount === 1
+      ? res.status(200).json({ message: "Class Offered successfully deleted" })
+      : res.status(404).json({ message: "Class Offered not found" });
+  } catch (error) {
+    console.error("Error deleting class offered:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 app.put("/api/classesoffered/update/:id", async (req, res) => {
-    try {
-      const classID = req.params.id;
-      const updateData = req.body;
-  
-      const db = await client.db("GSIMS");
-      const collection = await db.collection("ClassesOffered");
-  
-      // Ensure teacherId is a valid ObjectId
-      if (!ObjectId.isValid(classID)) {
-        return res.status(400).json({ message: "Invalid Class ID" });
-      }
-  
-      const result = await collection.updateOne(
-        { _id: new ObjectId(classID) },
-        { $set: updateData }
-      );
-  
-      if (result.modifiedCount > 0) {
-        res.status(200).json({ message: "Class updated successfully" });
-      } else {
-        res.status(404).json({ message: "Class not found or no changes made" });
-      }
-    } catch (error) {
-      console.error("Error updating Class:", error);
-      res.status(500).json({ message: error.message });
-    }
-  });
+  try {
+    const classID = req.params.id;
+    const updateData = req.body;
 
+    const db = await client.db("GSIMS");
+    const collection = await db.collection("ClassesOffered");
+
+    // Ensure teacherId is a valid ObjectId
+    if (!ObjectId.isValid(classID)) {
+      return res.status(400).json({ message: "Invalid Class ID" });
+    }
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(classID) },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount > 0) {
+      res.status(200).json({ message: "Class updated successfully" });
+    } else {
+      res.status(404).json({ message: "Class not found or no changes made" });
+    }
+  } catch (error) {
+    console.error("Error updating Class:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 app.get("/api/classes", async (req, res) => {
   try {
@@ -563,20 +571,22 @@ app.put("/api/classes/update/:id", async (req, res) => {
 });
 
 // DELETE a class
-app.delete('/api/classes/:id', async (req, res) => {
-    const classId = req.params.id;
-    if (!ObjectId.isValid(classId)) {
-        return res.status(400).json({ message: "Invalid Class ID" });
-    }
-    try {
-        const db = await client.db("GSIMS");
-        const collection = db.collection("Classes");
-        const result = await collection.deleteOne({ _id: new ObjectId(classId) });
-        result.deletedCount === 1 ? res.status(200).json({ message: "Class successfully deleted" }) : res.status(404).json({ message: "Class not found" });
-    } catch (error) {
-        console.error('Error deleting class:', error);
-        res.status(500).json({ message: error.message });
-    }
+app.delete("/api/classes/:id", async (req, res) => {
+  const classId = req.params.id;
+  if (!ObjectId.isValid(classId)) {
+    return res.status(400).json({ message: "Invalid Class ID" });
+  }
+  try {
+    const db = await client.db("GSIMS");
+    const collection = db.collection("Classes");
+    const result = await collection.deleteOne({ _id: new ObjectId(classId) });
+    result.deletedCount === 1
+      ? res.status(200).json({ message: "Class successfully deleted" })
+      : res.status(404).json({ message: "Class not found" });
+  } catch (error) {
+    console.error("Error deleting class:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // Do not close the client connection here
