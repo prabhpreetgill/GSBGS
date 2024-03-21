@@ -79,7 +79,7 @@ async function run() {
       }
     });
 
-    app.put("/api/students/:id", async (req, res) => {
+    app.put("/api/students/update/:id", async (req, res) => {
       try {
         const studentId = req.params.id; // Get the student ID from the URL parameter
         const updateData = req.body; // Get the update data from the request body

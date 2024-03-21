@@ -13,7 +13,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Classes } from "../../Scripts/school";
 import TransitionsSnackbar from "../Enroll/Submit";
 
 export default function AccordionExpandIcon({ url }) {
@@ -21,18 +20,39 @@ export default function AccordionExpandIcon({ url }) {
   const [allData, setAllData] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const [open, setOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [change, setChange] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch data from the given URL
         const response = await fetch(
           `https://gsbgs-backend.vercel.app/api/${url}`
         );
         const data = await response.json();
         setAllData(data);
-        const sortedData = data._students.sort((a, b) => {
-          return a._firstName.localeCompare(b._firstName);
-        });
+
+        const classStudentIds = data._students;
+
+        // Fetch all students
+        const studentsResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/students`
+        );
+        const studentsData = await studentsResponse.json();
+
+        // Filter students whose IDs are included in the class's student IDs list
+        const filteredStudents = studentsData.filter((student) =>
+          classStudentIds.includes(student._id)
+        );
+
+        // Sort the filtered students by first name
+        const sortedData = filteredStudents.sort((a, b) =>
+          a._firstName.localeCompare(b._firstName)
+        );
+
+        // Update your state with the sorted data
         setData(sortedData);
       } catch (error) {
         console.error("Error:", error);
@@ -40,43 +60,50 @@ export default function AccordionExpandIcon({ url }) {
     };
 
     fetchData();
-  }, [url]); // Only re-run the effect if url changes
+  }, [url, change]); // Only re-run the effect if url changes
 
   const updateClass = async () => {
-    if (selectedStudent && selectedStudent._id) {
-      const id = allData?._id;
-      const deleteStudent = Classes.fromClasses(allData);
-      deleteStudent.removeOneStudent(selectedStudent._id);
-      console.log(deleteStudent);
+    if (!selectedStudent) {
+      setMessage("No student selected");
+      triggerSnackbar();
+      return;
+    }
 
-      try {
-        const updateResponse = await fetch(
-          `https://gsbgs-backend.vercel.app/api/classes/update/${id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(deleteStudent),
-          }
-        );
-        if (updateResponse.ok) {
-          // Handle successful removal here, such as updating the UI
-          setMessage(`Student ${selectedStudent._firstName} removed successfully`);
-          triggerSnackbar();
-          // Close the dialog
-          handleClose();
-          // Optionally, refresh the list of students
-        } else {
-          // Handle error response
-          console.error("Failed to remove student");
+    // Assuming `selectedStudent` contains the student's ID and `allData` contains the full class data including the `_students` array
+    const updatedStudentsList = allData._students.filter(
+      (studentId) => studentId !== selectedStudent._id
+    );
+
+    try {
+      const updateResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/classes/update/${allData._id}`, // Make sure this is the correct endpoint for updating a class
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _students: updatedStudentsList }), // Send the updated list of student IDs
         }
-      } catch (error) {
-        console.error("Error:", error);
+      );
+
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
+        throw new Error(
+          errorData.message || "Failed to update class with removed student"
+        );
       }
+
+      // If successful, update the UI accordingly
+      setMessage(`Student removed successfully`);
+      triggerSnackbar();
+      setChange(!change);
+      handleClose(); // Assuming this closes a modal or dialog
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage(
+        error.message || "An error occurred while removing the student."
+      );
+      triggerSnackbar();
     }
   };
-
-  const [open, setOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
 
   const handleClickOpen = (student) => {
     setSelectedStudent(student);
@@ -90,7 +117,6 @@ export default function AccordionExpandIcon({ url }) {
   const triggerSnackbar = () => {
     setSnackbarOpen(true);
   };
-
 
   return (
     <div>
@@ -123,37 +149,44 @@ export default function AccordionExpandIcon({ url }) {
         <AccordionDetails>
           <List sx={{ width: "100%" }}>
             {/* Use the List component */}
-            {data.map((student, index) => (
+            {data?.map((student, index) => (
               <React.Fragment key={index}>
-              <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-                {/* Use Fragment to group items */}
-                <ListItem
+                <Box
                   sx={{
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    flexDirection: "column",
                   }}
                 >
-                  <Button
-                    textAlign={"center"}
+                  {/* Use Fragment to group items */}
+                  <ListItem
                     sx={{
-                      fontSize: { xs: "1rem" },
-                      color: "black",
-                      width: { xs: "57vw", lg: "22vw" },
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
-                    onClick={() => handleClickOpen(student)}
                   >
-                    {`${student._firstName} ${student._middleName} ${student._lastName}`}
-                  </Button>
-                </ListItem>
-                {index < data.length - 1 && (
-                  <Divider
-                    sx={{
-                      border: "1px solid black",
-                      width: { xs: "80%", lg: "22vw" },
-                    }}
-                  />
-                )}
+                    <Button
+                      textAlign={"center"}
+                      sx={{
+                        fontSize: { xs: "1rem" },
+                        color: "black",
+                        width: { xs: "57vw", lg: "22vw" },
+                      }}
+                      onClick={() => handleClickOpen(student)}
+                    >
+                      {`${student._firstName} ${student._middleName} ${student._lastName}`}
+                    </Button>
+                  </ListItem>
+                  {index < data.length - 1 && (
+                    <Divider
+                      sx={{
+                        border: "1px solid black",
+                        width: { xs: "80%", lg: "22vw" },
+                      }}
+                    />
+                  )}
                 </Box>
                 {/* Don't add a divider after the last item */}
               </React.Fragment>

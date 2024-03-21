@@ -58,16 +58,15 @@ export default function ClassesContainer({ week }) {
   return (
     <Box>
       <Container>
-        <Box
+      <Box
           sx={{
             bgcolor: "rgba(255, 255, 252, 1)",
-            height: "auto",
             borderRadius: "25px",
             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
             display: "flex",
-            width: "100%",
-            backgroundPositionY: { xs: "60px", xl: "0" },
-            padding: 0.5,
+            width: {xs: "80vw", md:"60vw"},
+            minHeight: {xs: '60vh'},
+            padding: 2
           }}
         >
           <Box
@@ -80,8 +79,8 @@ export default function ClassesContainer({ week }) {
             <Box
               sx={{
                 display: "flex",
+                width: '60vw',
                 flexDirection: { xs: "column", lg: "row" },
-                width: "100%",
                 marginTop: "3%",
               }}
             >

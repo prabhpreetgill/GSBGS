@@ -11,7 +11,6 @@ import {
 import Container from "@mui/material/Container";
 import ClassView from "./ClassView";
 import MultiText from "./MultiText";
-import { Classes } from "../../Scripts/school";
 import TransitionsSnackbar from "../Enroll/Submit";
 import { useParams } from "react-router-dom";
 
@@ -31,6 +30,8 @@ export default function SimpleContainer() {
     setselectedClassName(name);
     setOpen(true);
   }, []);
+
+  const term = useParams();
 
   const handleClose = () => {
     setOpen(false);
@@ -57,46 +58,67 @@ export default function SimpleContainer() {
   };
 
   const handleSubmit = async () => {
-    if (!selectedClass) {
-      setMessage("No class selected or class ID is missing");
+    if (!selectedClass || !students.length) {
+      setMessage(
+        "No class selected, class ID is missing, or no students selected."
+      );
       triggerSnackbar();
       return;
     }
 
-    const id = selectedClass._id; // Assuming selectedClass contains an _id field
-    const updateClass = Classes.fromClasses(selectedClass);
-    console.log(id);
+    const studentIdsToAdd = Array.isArray(students)
+      ? students.map((student) => student._id)
+      : [students._id];
 
-    // Concatenate the existing students with the new ones
-    const updatedStudents = [...updateClass._students, ...students];
+      if (!Array.isArray(termData._students)) {
+        termData._students = [];
+      }
 
-    // Enroll the students
-    updateClass.enrollStudents(updatedStudents);
+    // Combine existing student IDs with new ones, using Set to remove duplicates
+    const updatedStudents = [...termData._students, ...studentIdsToAdd];
+    setTermData({ ...termData, _students: updatedStudents });
+
 
     try {
-      const updateResponse = await fetch(
-        `https://gsbgs-backend.vercel.app/api/classes/update/${id}`,
+      // Update the class with new student IDs
+      await fetch(
+        `https://gsbgs-backend.vercel.app/api/classes/update/${selectedClass._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updateClass),
+          body: JSON.stringify({ _students: updatedStudents }),
         }
       );
 
-      if (updateResponse.ok) {
-        const updatedClass = await updateResponse.json();
-        setMessage(
-          `Class updated successfully. Class Name: ${updatedClass.name}`
+      // Optionally, update the term if necessary
+      // This step might require fetching the term data first to check if the class ID is already included
+      // Assuming we have the term ID and it's stored in `termId`
+      const termResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/term/${term.termId}`
+      );
+      const termData = await termResponse.json();
+
+      if (!termData._classes.includes(selectedClass._id)) {
+        
+        const updatedStudents = [
+          ...new Set([...termData._students, ...studentIdsToAdd]),
+        ];
+
+        await fetch(
+          `https://gsbgs-backend.vercel.app/api/term/update/${term.termId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedStudents),
+          }
         );
-        console.log("Updated Class:", updatedClass);
-      } else {
-        const errorResult = await updateResponse.json();
-        throw new Error(errorResult.message || "Failed to update class.");
       }
+
+      setMessage(`Added new students to ${selectedClass._name}.`);
     } catch (error) {
       console.error("Error in operations:", error);
       setMessage(
-        error.message || "An error occurred while updating the class."
+        error.message || "An error occurred while updating the class or term."
       );
     } finally {
       triggerSnackbar();
@@ -104,8 +126,6 @@ export default function SimpleContainer() {
       setOpen1(false); // Close Dialog after Submission
     }
   };
-
-  const term = useParams();
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -135,7 +155,9 @@ export default function SimpleContainer() {
     };
 
     fetchData();
-  }, [term.termId, termData]); // Depend on term.termId to refetch when it changes
+  }, [term.termId]); // Depend on term.termId to refetch when it changes
+
+  termData;
 
   const categorizedData = React.useMemo(() => {
     const friday = [];

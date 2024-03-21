@@ -5,6 +5,7 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Button,
 } from "@mui/material";
 import PropTypes from "prop-types"; // Import PropTypes for validation
 
@@ -12,6 +13,21 @@ export default function Students({ url, week }) {
   // Correctly receive url as a prop
   const [data, setData] = useState({ _teachers: [], _TAs: [], _students: [] });
   const [attendance, setAttendance] = useState({});
+  const [teacher, setTeacher] = useState([]);
+  const [ta, setTa] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [studentAttendence, setStudentAttendence] = useState([]);
+  const [teacherAttendence, setTeacherAttendence] = useState([]);
+  const [taAttendence, setTaAttendence] = useState([]);
+
+  teacherAttendence;
+  taAttendence;
+
+  students.forEach((student) => {
+    // if(studentAttendence.includes(student._id))
+    const value = studentAttendence.valueOf(student._id);
+    console.log(value[student._id]);
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,6 +37,34 @@ export default function Students({ url, week }) {
         );
         const newData = await response.json();
         setData(newData);
+
+        const teacherResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/teacher/${newData._teachers[0]}`
+        );
+        const teacherData = await teacherResponse.json();
+        setTeacher(teacherData);
+
+        const taResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/ta/${newData._TAs[0]}`
+        );
+        const taData = await taResponse.json();
+        setTa(taData);
+
+        const studentResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/students`
+        );
+        const studentData = await studentResponse.json();
+
+        const studentIds = newData._students || [];
+
+        // Filter the students whose IDs are included in `newData._students`
+        const filteredStudents = studentData.filter((student) =>
+          studentIds.includes(student._id)
+        );
+
+        // Update state with the filtered students
+        setStudents(filteredStudents);
+
         const initialAttendance = {};
         [...newData._teachers, ...newData._TAs, ...newData._students].forEach(
           (person) => {
@@ -37,86 +81,40 @@ export default function Students({ url, week }) {
   }, [url]);
 
   const updateStudent = (id, status) => {
-    setData((currentData) => {
-      // Map through _students to find the student by id and update their attendance
-      const updatedStudents = currentData._students.map((student) => {
-        if (student._id === id) {
-          // Assuming there's a way to structure attendance, e.g., an array of records
-          const updatedAttendance = {
-            className: data?._name,
-            date: `Week: ${week}`,
-            status: status,
-          };
+    const updatedAttendance = {
+      className: data?._name,
+      date: `Week: ${week}`,
+      status: status,
+      term: data._term,
+    };
 
-          // Update or initialize the student's attendance array
-          const newAttendanceRecords = student.attendanceRecords
-            ? [...student.attendanceRecords, updatedAttendance]
-            : [updatedAttendance];
-
-          return { ...student, _attendance: newAttendanceRecords };
-        }
-        return student;
-      });
-
-      return { ...currentData, _students: updatedStudents };
-    });
+    setStudentAttendence((prevAttendance) => ({
+      ...prevAttendance,
+      [id]: updatedAttendance, // Assuming you want to keep the latest attendance status
+    }));
   };
 
   const updateTeacher = (id, status) => {
-    setData((currentData) => {
-      // Map through _students to find the student by id and update their attendance
-      const updatedTeachers = currentData._teachers.map((teacher) => {
-        if (teacher._id === id) {
-          // Assuming there's a way to structure attendance, e.g., an array of records
-          const updatedAttendance = {
-            className: data?._name,
-            date: `Week: ${week}`,
-            status: status,
-          };
+    const updatedAttendance = {
+      className: data?._name,
+      date: `Week: ${week}`,
+      status: status,
+      term: data._term,
+    };
 
-          // Update or initialize the student's attendance array
-          const newAttendanceRecords = teacher.attendanceRecords
-            ? [...teacher.attendanceRecords, updatedAttendance]
-            : [updatedAttendance];
-
-          return { ...teacher, _attendance: newAttendanceRecords };
-        }
-        return teacher;
-      });
-
-      return { ...currentData, _students: updatedTeachers };
-    });
+    setTeacherAttendence(updatedAttendance);
   };
 
   const updateTA = (id, status) => {
-    setData((currentData) => {
-      // Map through _students to find the student by id and update their attendance
-      const updatedTA = currentData._TAs.map((ta) => {
-        if (ta._id === id) {
-          // Assuming there's a way to structure attendance, e.g., an array of records
-          const updatedAttendance = {
-            className: data?._name,
-            date: `Week: ${week}`,
-            status: status,
-          };
+    const updatedAttendance = {
+      className: data?._name,
+      date: `Week: ${week}`,
+      status: status,
+      term: data._term,
+    };
 
-          // Update or initialize the student's attendance array
-          const newAttendanceRecords = ta.attendanceRecords
-            ? [...ta.attendanceRecords, updatedAttendance]
-            : [updatedAttendance];
-
-          return { ...ta, _attendance: newAttendanceRecords };
-        }
-        return ta;
-      });
-
-      return { ...currentData, _students: updatedTA };
-    });
+    setTaAttendence(updatedAttendance);
   };
-
-  useEffect(() => {
-    console.log(data._teachers);
-  }, [data._teachers]); // This useEffect will run whenever data._students changes
 
   const handleAttendanceChangeStudent = (id, event) => {
     setAttendance({ ...attendance, [id]: event.target.value });
@@ -131,6 +129,62 @@ export default function Students({ url, week }) {
   const handleAttendanceChangeTa = (id, event) => {
     setAttendance({ ...attendance, [id]: event.target.value });
     updateTA(id, event.target.value);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // Define the week's identifier
+      const weekIdentifier = `Week: ${week}`;
+
+      // Helper function to update attendance for a given person (teacher, TA, or student)
+      const updateAttendanceForPerson = async (
+        personType,
+        personId,
+        attendanceRecord
+      ) => {
+        const response = await fetch(
+          `https://gsbgs-backend.vercel.app/api/${personType}/${personId}`
+        );
+        const personData = await response.json();
+        // Check if there's already an attendance record for this week
+        let attendanceUpdated = false;
+        const updatedAttendance = personData._attendance.map((record) => {
+          if (record.date === weekIdentifier) {
+            attendanceUpdated = true;
+            return { ...record, ...attendanceRecord }; // Merge existing record with new attendance info
+          }
+          return record;
+        });
+        // If the week's record wasn't found, add a new one
+        if (!attendanceUpdated) {
+          updatedAttendance.push({ ...attendanceRecord, date: weekIdentifier });
+        }
+
+        await fetch(
+          `https://gsbgs-backend.vercel.app/api/${personType}/update/${personId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ _attendance: updatedAttendance }),
+          }
+        );
+      };
+
+      // Update attendance for the teacher
+      await updateAttendanceForPerson("teacher", teacher._id, teacherAttendence);
+
+      // Update attendance for the TA
+      await updateAttendanceForPerson("ta", ta._id, taAttendence);
+
+      // Update attendance for each student
+      for (const student of students) {
+        await updateAttendanceForPerson("students", student._id, studentAttendence[student._id]);
+      }
+    } catch (error) {
+      console.error("Error in operations:", error);
+    } finally {
+      // Finalize your function
+    }
   };
 
   if (
@@ -154,77 +208,73 @@ export default function Students({ url, week }) {
       <Typography variant="h5" sx={{ my: 2 }}>
         TEACHERS
       </Typography>
-      {data._teachers.map((teacher) => (
-        <Box
-          key={teacher._id}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            marginBottom: 2,
-          }}
+      <Box
+        key={teacher._id}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+          marginBottom: 2,
+        }}
+      >
+        <Typography sx={{ fontSize: { xs: "1.5rem", lg: "2rem" } }}>
+          {teacher._firstName} {teacher._lastName}
+        </Typography>
+        <RadioGroup
+          row
+          name={`attendance-${teacher._id}`}
+          value={attendance[teacher._id] || "present"}
+          onChange={(e) => handleAttendanceChangeTeacher(teacher._id, e)}
         >
-          <Typography sx={{ fontSize: { xs: "1.5rem", lg: "2rem" } }}>
-            {teacher.firstName} {teacher.lastName}
-          </Typography>
-          <RadioGroup
-            row
-            name={`attendance-${teacher._id}`}
-            value={attendance[teacher._id] || "present"}
-            onChange={(e) => handleAttendanceChangeTeacher(teacher._id, e)}
-          >
-            {["Present", "Late", "Absent"].map((option) => (
-              <FormControlLabel
-                key={option}
-                value={option}
-                control={<Radio />}
-                label={option}
-              />
-            ))}
-          </RadioGroup>
-        </Box>
-      ))}
+          {["Present", "Late", "Absent"].map((option) => (
+            <FormControlLabel
+              key={option}
+              value={option}
+              control={<Radio />}
+              label={option}
+            />
+          ))}
+        </RadioGroup>
+      </Box>
 
       {/* TAs */}
       <Typography variant="h5" sx={{ my: 2 }}>
         TAs
       </Typography>
-      {data._TAs.map((ta) => (
-        <Box
-          key={ta._id}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            marginBottom: 2,
-          }}
+      <Box
+        key={ta._id}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+          marginBottom: 2,
+        }}
+      >
+        <Typography sx={{ fontSize: { xs: "1.5rem", lg: "2rem" } }}>
+          {ta._firstName} {ta._lastName}
+        </Typography>
+        <RadioGroup
+          row
+          name={`attendance-${ta._id}`}
+          value={attendance[ta._id] || "present"}
+          onChange={(e) => handleAttendanceChangeTa(ta._id, e)}
         >
-          <Typography sx={{ fontSize: { xs: "1.5rem", lg: "2rem" } }}>
-            {ta._firstName} {ta._lastName}
-          </Typography>
-          <RadioGroup
-            row
-            name={`attendance-${ta._id}`}
-            value={attendance[ta._id] || "present"}
-            onChange={(e) => handleAttendanceChangeTa(ta._id, e)}
-          >
-            {["Present", "Late", "Absent"].map((option) => (
-              <FormControlLabel
-                key={option}
-                value={option}
-                control={<Radio />}
-                label={option}
-              />
-            ))}
-          </RadioGroup>
-        </Box>
-      ))}
+          {["Present", "Late", "Absent"].map((option) => (
+            <FormControlLabel
+              key={option}
+              value={option}
+              control={<Radio />}
+              label={option}
+            />
+          ))}
+        </RadioGroup>
+      </Box>
 
       {/* Students */}
       <Typography variant="h5" sx={{ my: 2 }}>
         STUDENTS
       </Typography>
-      {data._students.map((student) => (
+      {students.map((student) => (
         <Box
           key={student._id}
           sx={{
@@ -254,6 +304,13 @@ export default function Students({ url, week }) {
           </RadioGroup>
         </Box>
       ))}
+      <Button
+        variant="contained"
+        sx={{ padding: "10px 50px", marginBottom: "20px" }}
+        onClick={handleSubmit} // Set onClick to the function reference
+      >
+        Save
+      </Button>
     </Box>
   );
 }

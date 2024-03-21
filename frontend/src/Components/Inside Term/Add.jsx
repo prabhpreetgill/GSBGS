@@ -49,15 +49,29 @@ function AddClass() {
 
   const Term = useParams();
 
-  
-
   // Function to Handle Form Submission
   const handleSubmit = async () => {
-    const newClass = new Classes(className._name, day, [], [], []);
-    newClass.assignTeacher(teacher._id);
-    newClass.assignTA(ta._id);
-
     try {
+      // Fetch and update the current term with the new class's ID
+      const termResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/term/${Term.termId}`
+      );
+      if (!termResponse.ok) throw new Error("Failed to fetch term data.");
+
+      const termData = await termResponse.json();
+
+      const newClass = new Classes(
+        className._name,
+        day,
+        termData._id,
+        termData._name,
+        [],
+        [],
+        []
+      );
+      newClass.assignTeacher(teacher._id);
+      newClass.assignTA(ta._id);
+
       // Add the new class
       const classResponse = await fetch(
         `https://gsbgs-backend.vercel.app/api/classes/add`,
@@ -71,13 +85,6 @@ function AddClass() {
 
       const classData = await classResponse.json();
 
-      // Fetch and update the current term with the new class's ID
-      const termResponse = await fetch(
-        `https://gsbgs-backend.vercel.app/api/term/${Term.termId}`
-      );
-      if (!termResponse.ok) throw new Error("Failed to fetch term data.");
-
-      const termData = await termResponse.json();
       const updatedClassesForTerm = [...termData._classes, classData._id];
 
       const termUpdateResponse = await fetch(
@@ -111,9 +118,7 @@ function AddClass() {
       if (!teacherUpdateResponse.ok)
         throw new Error("Failed to update teacher with new class.");
 
-      setMessage(
-        `Added Class ${className._name} to Term ${termData._name}`
-      );
+      setMessage(`Added Class ${className._name} to Term ${termData._name}`);
     } catch (error) {
       console.error("Error in operations:", error);
       setMessage(error.message || "An unexpected error occurred.");
