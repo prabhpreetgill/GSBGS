@@ -87,7 +87,14 @@ export default function Finance() {
             >
               <Typography
                 textAlign={"center"}
-                sx={{ fontSize: { xs: "3rem", md: "4rem", animationDelay: '0.2s', opacity: 0}}}
+                sx={{
+                  fontSize: {
+                    xs: "3rem",
+                    md: "4rem",
+                    animationDelay: "0.2s",
+                    opacity: 0,
+                  },
+                }}
                 className="fade-in"
               >
                 {monthsInfo[currentPage - 1]?.startDate}
@@ -100,22 +107,33 @@ export default function Finance() {
                     variant="fullWidth"
                     indicatorColor="primary"
                     textColor="primary"
-                    sx={{marginBottom: '20px'}}
+                    sx={{ marginBottom: "20px", opacity: 0, animationDelay: '0.3s'}}
+                    className="fade-in"
                   >
                     <Tab label="Unpaid" />
                     <Tab label="Paid" />
                   </Tabs>
                   {tabValue === 0 && (
-                    <Unpaid
-                      month={monthsInfo[currentPage - 1]?.formatted}
-                      term={currentTerms[0]?._id}
-                    />
+                    <Box
+                      sx={{ animationDelay: "0.3s", opacity: 0 }}
+                      className="fade-in"
+                    >
+                      <Unpaid
+                        month={monthsInfo[currentPage - 1]?.formatted}
+                        term={currentTerms[0]?._id}
+                      />
+                    </Box>
                   )}
                   {tabValue === 1 && (
-                    <Paid
-                      month={monthsInfo[currentPage - 1]?.formatted}
-                      term={currentTerms[0]?._id}
-                    />
+                    <Box
+                      sx={{ animationDelay: "0.4s", opacity: 0 }}
+                      className="fade-in"
+                    >
+                      <Paid
+                        month={monthsInfo[currentPage - 1]?.formatted}
+                        term={currentTerms[0]?._id}
+                      />
+                    </Box>
                   )}
                 </>
               ) : (

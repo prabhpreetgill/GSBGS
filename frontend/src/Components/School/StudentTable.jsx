@@ -173,5 +173,5 @@ export default function StudentTable({url}) {
 }
 
 StudentTable.propTypes = {
-  url: PropTypes.string.isRequired,
+  url: PropTypes.string,
 };

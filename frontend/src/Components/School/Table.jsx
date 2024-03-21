@@ -101,13 +101,13 @@ export default function TableMaker({ url }) {
       );
 
       if (response.ok) {
-        console.log("Student successfully deleted.");
+        console.log("Teacher successfully deleted.");
         setMessage(`Deleted ${firstName}`);
         setOpen(false);
         triggerSnackbar();
-        // You can update the UI here, for example, by removing the student from the displayed list
+        // You can update the UI here, for example, by removing the teacher from the displayed list
       } else {
-        console.error("Failed to delete student.");
+        console.error("Failed to delete Teacher.");
         // Handle failure, possibly by showing an error message to the user
       }
     } catch (error) {
@@ -190,15 +190,15 @@ export default function TableMaker({ url }) {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("Student added:", result);
+        console.log("teacher added:", result);
         // Handle success (e.g., show success message, clear form)
         setMessage(`Updated ${firstName}`);
         triggerSnackbar();
       } else {
         // Handle errors (e.g., show error message)
         const errorResult = await response.json();
-        console.error("Error adding student:", errorResult.message);
-        setMessage("Could not enroll Student");
+        console.error("Error adding teacher:", errorResult.message);
+        setMessage("Could not enroll teacher");
         triggerSnackbar();
       }
     } catch (error) {

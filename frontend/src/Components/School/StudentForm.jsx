@@ -43,7 +43,7 @@ export default function StudentForm({ studentId }) {
           setpLname(data._pLname);
           setpEmail(data._pEmail);
           setpPhone(data._pPhone);
-          setPaid(data._paid);
+          setPaid(data.paymentPlan);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -98,9 +98,11 @@ export default function StudentForm({ studentId }) {
       paid
     );
 
+    console.log(studentId)
+
     try {
       const response = await fetch(
-        `https://gsbgs-backend.vercel.app/api/students/${studentId}`,
+        `https://gsbgs-backend.vercel.app/api/students/update/${studentId}`,
         {
           method: "PUT",
           headers: {
@@ -206,7 +208,7 @@ export default function StudentForm({ studentId }) {
           </Box>
           <Divider sx={dividerStyle} />
           <Typography variant="h4" sx={titleStyle}>
-            Paid?
+            Payment Plan
           </Typography>
           <Box sx={rowStyle}>
             <Dropdown value={paid} onChange={(e) => setPaid(e.target.value)} />
@@ -281,5 +283,5 @@ const dividerStyle = {
 };
 
 StudentForm.propTypes = {
-  studentId: PropTypes.string.isRequired,
+  studentId: PropTypes.string,
 };

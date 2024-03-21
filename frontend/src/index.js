@@ -10,13 +10,15 @@ import InTerm from "./Components/Inside Term/InTerm";
 import School from "./Components/School/School";
 import Attendance from "./Components/Attendance/Attendance";
 import Finance from "./Components/Finance/Finance";
+import Login from "./Components/Login/Login";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="" element={<App />}></Route>
+      <Route path="/" element={<Login />}></Route>
+        <Route path="/home" element={<App />}></Route>
         <Route path="/enroll" element={<Enroll />}></Route>
         <Route path="/attendance" element={<Attendance />}></Route>
         <Route path="/finance" element={<Finance />}></Route>

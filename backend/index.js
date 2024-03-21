@@ -399,17 +399,17 @@ async function run() {
       try {
         // Extract the ID from the request parameters
         const taId = req.params.id;
-    
+
         // Connect to the database
         const db = await client.db("GSIMS");
         const collection = db.collection("TA");
-    
+
         // Convert string ID to ObjectId for MongoDB
         const objectId = new ObjectId(taId);
-    
+
         // Find the TA document by ID
         const taDocument = await collection.findOne({ _id: objectId });
-    
+
         if (taDocument) {
           // If the document is found, send it back in the response
           res.status(200).json(taDocument);
@@ -422,7 +422,6 @@ async function run() {
         res.status(500).json({ message: error.message });
       }
     });
-    
 
     app.post("/api/ta/add", async (req, res) => {
       try {
@@ -709,6 +708,41 @@ async function run() {
           : res.status(404).json({ message: "Class not found" });
       } catch (error) {
         console.error("Error deleting class:", error);
+        res.status(500).json({ message: error.message });
+      }
+    });
+
+    const jwt = require("jsonwebtoken");
+    const secretKey = process.env.JWT_SECRET || "your_secret_key"; // Ensure this is secure and not exposed
+
+    app.post("/api/login", async (req, res) => {
+      const { username, password } = req.body;
+      const db = await client.db("GSIMS");
+      const collection = await db.collection("Users");
+
+      try {
+        const user = await collection.findOne({ username });
+
+        if (!user) {
+          return res
+            .status(401)
+            .json({ message: "Invalid username or password" });
+        }
+
+        const match = await bcrypt.compare(password, user.password);
+
+        if (match) {
+          // Passwords match, create JWT
+          const token = jwt.sign({ userId: user._id }, secretKey, {
+            expiresIn: "1h",
+          });
+
+          res.json({ message: "You are now logged in!", token });
+        } else {
+          res.status(401).json({ message: "Invalid username or password" });
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
         res.status(500).json({ message: error.message });
       }
     });

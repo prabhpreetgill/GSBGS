@@ -151,15 +151,15 @@ export default function ClassTable(url) {
       if (response.ok) {
         const result = await response.json();
         triggerRefresh();
-        console.log("Student added:", result);
+        console.log("Class added:", result);
         // Handle success (e.g., show success message, clear form)
         setMessage(`Updated ${name._name}`);
         triggerSnackbar();
       } else {
         // Handle errors (e.g., show error message)
         const errorResult = await response.json();
-        console.error("Error adding student:", errorResult.message);
-        setMessage("Could not enroll Student");
+        console.error("Error adding class:", errorResult.message);
+        setMessage("Could not Update Class");
         triggerSnackbar();
       }
     } catch (error) {
