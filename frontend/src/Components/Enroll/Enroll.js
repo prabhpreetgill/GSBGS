@@ -3,7 +3,7 @@ import "../../App.css";
 import Sidebar from "../Sidebar/Sidebar";
 import { Box } from "@mui/material";
 import Form from "./Form";
-import "../../App.css"
+import "../../App.css";
 
 function Enroll() {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -20,28 +20,27 @@ function Enroll() {
 
   return (
     <div className="background">
+      <Sidebar />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: { xs: "100vw", lg: `calc(100% - ${sidebarWidth})` }, // Dynamically calculate width
+          marginLeft: { xs: "0", lg: sidebarWidth },
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
-            flexDirection: "column",
-            width: {xs: '100vw', lg: `calc(100% - ${sidebarWidth})`}, // Dynamically calculate width
-            marginLeft: {xs: '0' ,lg: sidebarWidth},
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh'
+            margin: "25px",
           }}
+          className={isFormVisible ? "fade-in" : "hidden"}
         >
-          <Sidebar />
-          <Box
-            sx={{
-              display: "flex",
-              margin: "25px",
-            }}
-            className={isFormVisible ? 'fade-in' : 'hidden'}
-          >
-            <Form />
-          </Box>
+          <Form />
         </Box>
+      </Box>
     </div>
   );
 }

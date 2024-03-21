@@ -7,10 +7,10 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
-import Container from "@mui/material/Container";
 import Students from "./StudentView";
 import PropTypes from "prop-types"; // Import PropTypes for validation
 import TransitionsSnackbar from "../Enroll/Submit";
+import "../../App.css";
 
 export default function ClassesContainer({ week }) {
   const [data, setData] = React.useState([]);
@@ -64,16 +64,15 @@ export default function ClassesContainer({ week }) {
 
   return (
     <Box>
-      <Container>
-      <Box
+        <Box
           sx={{
             bgcolor: "rgba(255, 255, 252, 1)",
             borderRadius: "25px",
             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
             display: "flex",
-            width: {xs: "80vw", md:"60vw"},
-            minHeight: {xs: '60vh'},
-            padding: 2
+            width: { xs: "80vw", md: "70vw" },
+            minHeight: { xs: "60vh" },
+            padding: 2,
           }}
         >
           <Box
@@ -86,7 +85,7 @@ export default function ClassesContainer({ week }) {
             <Box
               sx={{
                 display: "flex",
-                width: '60vw',
+                width: "70vw",
                 flexDirection: { xs: "column", lg: "row" },
                 marginTop: "3%",
               }}
@@ -98,7 +97,13 @@ export default function ClassesContainer({ week }) {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h4">Friday</Typography>
+                <Typography
+                  variant="h4"
+                  sx={{ animationDelay: "0.2s", opacity: 0 }}
+                  className="fade-in"
+                >
+                  Friday
+                </Typography>
                 <Box
                   sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
                 >
@@ -112,6 +117,8 @@ export default function ClassesContainer({ week }) {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(115,134,222,0.5)",
+                        animationDelay: `${0.1 * index + 0.2}s`, // Correctly calculate and apply delay
+                        opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
@@ -120,6 +127,7 @@ export default function ClassesContainer({ week }) {
                           // You can add more styles here
                         },
                       }}
+                      className="fade-in"
                       onClick={() => handleClickOpen(element, element._name)} // Corrected
                     >
                       <Typography
@@ -140,7 +148,13 @@ export default function ClassesContainer({ week }) {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h4">Saturday</Typography>
+                <Typography
+                  variant="h4"
+                  sx={{ opacity: 0, animationDelay: "0.3s" }}
+                  className="fade-in"
+                >
+                  Saturday
+                </Typography>{" "}
                 <Box
                   sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
                 >
@@ -154,6 +168,8 @@ export default function ClassesContainer({ week }) {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(148,215,202, 0.5)",
+                        animationDelay: `${0.1 * index + 0.3}s`, // Correctly calculate and apply delay
+                        opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
@@ -163,6 +179,7 @@ export default function ClassesContainer({ week }) {
                         },
                       }}
                       onClick={() => handleClickOpen(element, element._name)} // Corrected
+                      className="fade-in"
                     >
                       <Typography
                         variant="h6"
@@ -182,7 +199,13 @@ export default function ClassesContainer({ week }) {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h4">Sunday</Typography>
+                <Typography
+                  variant="h4"
+                  sx={{ opacity: 0, animationDelay: "0.4s" }}
+                  className="fade-in"
+                >
+                  Sunday
+                </Typography>{" "}
                 <Box
                   sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
                 >
@@ -196,6 +219,8 @@ export default function ClassesContainer({ week }) {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(237, 182, 134, 0.5)",
+                        animationDelay: `${0.1 * index + 0.4}s`, // Correctly calculate and apply delay
+                        opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
@@ -205,6 +230,7 @@ export default function ClassesContainer({ week }) {
                         },
                       }}
                       onClick={() => handleClickOpen(element, element._name)} // Corrected
+                      className="fade-in"
                     >
                       <Typography
                         variant="h6"
@@ -220,7 +246,6 @@ export default function ClassesContainer({ week }) {
             </Box>
           </Box>
         </Box>
-      </Container>
       <Dialog
         // fullScreen={fullScreen}
         open={open}
@@ -247,7 +272,13 @@ export default function ClassesContainer({ week }) {
           {selectedClassName}
         </DialogTitle>
         <DialogContent>
-        <Students url={selectedClass._id} week={week} onClose={handleClose} message={setMessage} snackbar={triggerSnackbar}/>
+          <Students
+            url={selectedClass._id}
+            week={week}
+            onClose={handleClose}
+            message={setMessage}
+            snackbar={triggerSnackbar}
+          />
         </DialogContent>
       </Dialog>
       <TransitionsSnackbar

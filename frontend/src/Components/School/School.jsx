@@ -17,10 +17,10 @@ function Term() {
 
   useEffect(() => {
     const titleTimer = setTimeout(() => setShowTitle(true), 100); // Show title after 100ms
-    const studentBtnTimer = setTimeout(() => setShowStudentBtn(true), 350); // Show student button after 350ms
-    const classBtnTimer = setTimeout(() => setShowClassBtn(true), 600); // Show class button after 600ms
-    const teacherBtnTimer = setTimeout(() => setShowTeacherBtn(true), 850); // Show teacher button after 850ms
-    const taBtnTimer = setTimeout(() => setShowTaBtn(true), 1100); // Show TA button after 1100ms
+    const studentBtnTimer = setTimeout(() => setShowStudentBtn(true), 200); // Show student button after 350ms
+    const classBtnTimer = setTimeout(() => setShowClassBtn(true), 300); // Show class button after 600ms
+    const teacherBtnTimer = setTimeout(() => setShowTeacherBtn(true), 400); // Show teacher button after 850ms
+    const taBtnTimer = setTimeout(() => setShowTaBtn(true), 500); // Show TA button after 1100ms
 
     return () => {
       clearTimeout(titleTimer);

@@ -14,8 +14,8 @@ export default function BasicSelect({ value, onChange }) {
           value={value}
           onChange={onChange}
         >
-          <MenuItem value={true}>Monthly</MenuItem>
-          <MenuItem value={false}>Annual</MenuItem>
+          <MenuItem value={"Monthly"}>Monthly</MenuItem>
+          <MenuItem value={"Annual"}>Annual</MenuItem>
         </Select>
       </FormControl>
     </Box>                                                          

@@ -27,7 +27,6 @@ function CurrentTerm() {
         setPrevious(previous.length > 0 ? "Previous Terms" : "");
       })
       .catch((error) => console.error("Error:", error));
-
   }, [currentTerms]);
 
   let navigate = useNavigate();
@@ -36,7 +35,6 @@ function CurrentTerm() {
   const handleNavigation = (where) => () => {
     navigate(where);
   };
-
 
   return (
     <Box
@@ -79,7 +77,7 @@ function CurrentTerm() {
                 padding: "10px 50px",
                 marginBottom: "20px",
                 width: { xs: "80vw", lg: "60vw" },
-                height: "20vh",
+                height: { xs: "15vh", lg: "20vh" },
                 display: "flex",
                 justifyContent: "space-around",
                 borderRadius: "30px",
@@ -107,7 +105,7 @@ function CurrentTerm() {
                   fontWeight="bold"
                   sx={{
                     textShadow: "0px 4px 7px rgba(89, 89, 89, 1)",
-                    fontSize: { xs: "2.5rem", lg: "3rem" },
+                    fontSize: { xs: "1.8rem", lg: "3rem" },
                   }}
                 >
                   {currentTerms[0]._name}
@@ -115,7 +113,7 @@ function CurrentTerm() {
                 <Typography
                   fontWeight="bold"
                   color="black"
-                  sx={{ fontSize: { xs: "2rem", lg: "3rem" } }}
+                  sx={{ fontSize: { xs: "1.8rem", lg: "3rem" } }}
                 >
                   {`${new Date(
                     currentTerms[0]._start
@@ -141,7 +139,12 @@ function CurrentTerm() {
               <Typography
                 variant="h2"
                 fontWeight="bold"
-                sx={{ marginBottom: "20px", textAlign: "center", opacity: 0, animationDelay: '0.5s'}}
+                sx={{
+                  marginBottom: "20px",
+                  textAlign: "center",
+                  opacity: 0,
+                  animationDelay: "0.5s",
+                }}
                 className="fade-in"
               >
                 {previous}
@@ -154,7 +157,7 @@ function CurrentTerm() {
                     padding: "10px 50px",
                     marginBottom: "20px",
                     width: { xs: "80vw", lg: "60vw" },
-                    height: "20vh",
+                    height: { xs: "15vh", lg: "20vh" },
                     display: "flex",
                     justifyContent: "space-around",
                     borderRadius: "30px",
@@ -163,7 +166,7 @@ function CurrentTerm() {
                     border: "none",
                     transitionDuration: "0.2s",
                     opacity: 0,
-                    animationDelay: '0.6s',
+                    animationDelay: "0.6s",
                     "&:hover": {
                       // Styles to apply on hover
                       boxShadow: "rgba(0, 0, 0, 0.45) 0px 15px 15px",
@@ -182,7 +185,7 @@ function CurrentTerm() {
                       fontWeight="bold"
                       sx={{
                         textShadow: "0px 4px 7px rgba(89, 89, 89, 1)",
-                        fontSize: { xs: "2.5rem", lg: "3rem" },
+                        fontSize: { xs: "1.8rem", lg: "3rem" },
                       }}
                     >
                       {term._name}
@@ -190,7 +193,7 @@ function CurrentTerm() {
                     <Typography
                       fontWeight="bold"
                       color="black"
-                      sx={{ fontSize: { xs: "2rem", lg: "3rem" } }}
+                      sx={{ fontSize: { xs: "1.8rem", lg: "3rem" } }}
                     >
                       {`${new Date(term._start).getFullYear()} - ${new Date(
                         term._end
@@ -208,8 +211,7 @@ function CurrentTerm() {
           variant="h2"
           fontWeight="bold"
           sx={{ marginBottom: "20px" }}
-        >
-        </Typography>
+        ></Typography>
       )}
     </Box>
   );

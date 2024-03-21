@@ -8,7 +8,6 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
-import Container from "@mui/material/Container";
 import ClassView from "./ClassView";
 import MultiText from "./MultiText";
 import TransitionsSnackbar from "../Enroll/Submit";
@@ -163,8 +162,6 @@ export default function SimpleContainer() {
 
   return (
     <Box>
-      <Box />
-      <Container>
         <Box
           sx={{
             bgcolor: "rgba(255, 255, 252, 1)",
@@ -172,7 +169,7 @@ export default function SimpleContainer() {
             borderRadius: "25px",
             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
             display: "flex",
-            width: "75vw",
+            width: {xs: '80vw', lg:"75vw"},
             backgroundPositionY: { xs: "60px", xl: "0" },
           }}
         >
@@ -227,7 +224,7 @@ export default function SimpleContainer() {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(115,134,222,0.5)",
-                        animationDelay: `${0.1 * index + 0.4}s`, // Correctly calculate and apply delay
+                        animationDelay: `${0.1 * index + 0.2}s`, // Correctly calculate and apply delay
                         opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
@@ -278,7 +275,7 @@ export default function SimpleContainer() {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(148,215,202, 0.5)",
-                        animationDelay: `${0.1 * index + 0.5}s`, // Correctly calculate and apply delay
+                        animationDelay: `${0.1 * index + 0.3}s`, // Correctly calculate and apply delay
                         opacity: 0,
                         "&:hover": {
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
@@ -327,7 +324,7 @@ export default function SimpleContainer() {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(237, 182, 134, 0.5)",
-                        animationDelay: `${0.1 * index + 0.6}s`, // Correctly calculate and apply delay
+                        animationDelay: `${0.1 * index + 0.4}s`, // Correctly calculate and apply delay
                         opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
@@ -338,6 +335,7 @@ export default function SimpleContainer() {
                         },
                       }}
                       onClick={() => handleClickOpen(element, element._name)} // Corrected
+                      className="fade-in"
                     >
                       <Typography
                         variant="h6"
@@ -353,7 +351,6 @@ export default function SimpleContainer() {
             </Box>
           </Box>
         </Box>
-      </Container>
       <Dialog
         // fullScreen={fullScreen}
         open={open}

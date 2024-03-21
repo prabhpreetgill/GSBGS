@@ -6,8 +6,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import Text from "../Enroll/Text"; // Custom Text Input Component
 import Dates from "./DatePicker"; // Custom Date Picker Component
@@ -23,9 +21,6 @@ function AddTerm() {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controls Snackbar Open/Close
   const [message, setMessage] = React.useState(""); // Stores the Snackbar Message
 
-  // Theme and Media Query for Responsive Dialog
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // Function to Open the Dialog
   const handleClickOpen = () => {
@@ -112,12 +107,11 @@ function AddTerm() {
         </Button>
 
         <Dialog
-          fullScreen={fullScreen}
           open={open}
           onClose={handleClose}
           aria-labelledby="responsive-dialog-title"
         >
-          <DialogTitle id="responsive-dialog-title">Add a New Term</DialogTitle>
+          <DialogTitle id="responsive-dialog-title" sx={{textAlign: 'center', fontSize: {xs: '2rem'}}}>Add a New Term</DialogTitle>
           <DialogContent>
             {Text({
               label: "Term Name",

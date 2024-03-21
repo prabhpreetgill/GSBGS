@@ -3,6 +3,7 @@ import "../../App.css";
 import Sidebar from "../Sidebar/Sidebar";
 import { Box, Pagination, Typography } from "@mui/material";
 import ClassesContainer from "./Classses";
+import "../../App.css"
 
 function Attendance() {
   const sidebarWidth = "150px";
@@ -83,7 +84,7 @@ function Attendance() {
         >
           <Sidebar />
           {loading ? (
-            <Box>Loading...</Box>
+            <Box></Box>
           ) : (
             <Box
               sx={{
@@ -94,7 +95,7 @@ function Attendance() {
                 margin: "25px",
               }}
             >
-              <Box sx={{ margin: "10px" }}>
+              <Box sx={{ margin: "10px", opacity: 0, animationDelay: '0.1s'}} className='fade-in'>
                 <Typography textAlign={"center"} sx={{ fontSize: "4rem" }}>
                   Week {currentPage}
                 </Typography>
@@ -109,7 +110,8 @@ function Attendance() {
                   flexDirection: "column", // Use column for vertical centering of internal items if needed
                   alignItems: "center", // Center items horizontally in the container
                   justifyContent: "center", // Center items vertically if flexDirection is column
-                  padding: 2
+                  padding: 2,
+                  width: '70vw',
                 }}
               >
                 <ClassesContainer week={currentPage} />

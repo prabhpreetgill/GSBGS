@@ -12,7 +12,7 @@ export default function TransitionsSnackbar({ open, setOpen, alert }) {
   };
 
   return (
-    <Box>
+    <Box sx={{zIndex: 10000}}>
       <Snackbar
         open={open}
         onClose={handleClose}
