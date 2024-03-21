@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types"; // Import PropTypes for validation
 
-export default function Students({ url, week }) {
+export default function Students({ url, week, onClose, message, snackbar }) {
   // Correctly receive url as a prop
   const [data, setData] = useState({ _teachers: [], _TAs: [], _students: [] });
   const [attendance, setAttendance] = useState({});
@@ -19,15 +19,6 @@ export default function Students({ url, week }) {
   const [studentAttendence, setStudentAttendence] = useState([]);
   const [teacherAttendence, setTeacherAttendence] = useState([]);
   const [taAttendence, setTaAttendence] = useState([]);
-
-  teacherAttendence;
-  taAttendence;
-
-  students.forEach((student) => {
-    // if(studentAttendence.includes(student._id))
-    const value = studentAttendence.valueOf(student._id);
-    console.log(value[student._id]);
-  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -170,20 +161,43 @@ export default function Students({ url, week }) {
         );
       };
 
-      // Update attendance for the teacher
-      await updateAttendanceForPerson("teacher", teacher._id, teacherAttendence);
+      if (teacherAttendence != undefined) {
+        // Update attendance for the teacher
+        await updateAttendanceForPerson(
+          "teacher",
+          teacher._id,
+          teacherAttendence
+        );
+      }
 
-      // Update attendance for the TA
-      await updateAttendanceForPerson("ta", ta._id, taAttendence);
+      if (taAttendence != undefined) {
+        // Update attendance for the TA
+        await updateAttendanceForPerson("ta", ta._id, taAttendence);
+      }
 
-      // Update attendance for each student
-      for (const student of students) {
-        await updateAttendanceForPerson("students", student._id, studentAttendence[student._id]);
+      if (studentAttendence != undefined) {
+        // Update attendance for each student
+        for (const student of students) {
+          await updateAttendanceForPerson(
+            "students",
+            student._id,
+            studentAttendence[student._id]
+          );
+        }
+        message("Saved Attendance");
+        if (onClose) {
+          onClose(); // This will call the handleClose function passed from ClassesContainer
+        }
       }
     } catch (error) {
       console.error("Error in operations:", error);
+      message("Could not save Attendance");
     } finally {
-      // Finalize your function
+      setAttendance([]);
+      setTaAttendence([]);
+      setStudentAttendence([]);
+      setTeacherAttendence([]);
+      snackbar();
     }
   };
 
@@ -316,11 +330,9 @@ export default function Students({ url, week }) {
 }
 
 Students.propTypes = {
-  url: PropTypes.string.isRequired, // Validate url is a string and required
-  week: PropTypes.shape({
-    // Assuming week is an object with specific properties
-    start: PropTypes.string, // Example property inside week object
-    end: PropTypes.string, // Example property inside week object
-    // Add more properties as needed, based on the structure of your week object
-  }), // week is an object, but not marked as required; adjust based on your use case
+  url: PropTypes.string, // Other prop types
+  week: PropTypes.number.isRequired,
+  onClose: PropTypes.func, // Ensure this matches the casing and is marked as required if necessary
+  message: PropTypes.func.isRequired,
+  snackbar: PropTypes.func.isRequired,
 };

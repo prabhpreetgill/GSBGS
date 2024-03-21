@@ -1,8 +1,16 @@
 import { Box } from "@mui/material";
 import Logo from "../../public/logo.jpeg"; // Ensure this path is correct
 import React from "react";
+import PropTypes from "prop-types";
 
-function HomeLogo() {
+function HomeLogo({ onLoad }) {
+  // Call the onLoad prop when the image finishes loading
+  const handleLoad = () => {
+    if (onLoad) {
+      onLoad();
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -11,6 +19,7 @@ function HomeLogo() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        paddingTop: '20px',
         paddingBottom: '20px',
       }}
     >
@@ -22,9 +31,15 @@ function HomeLogo() {
         }}
         src={Logo}
         alt="Logo"
+        onLoad={handleLoad} // Use the onLoad event of the img tag
       />
     </Box>
   );
 }
 
 export default HomeLogo;
+
+HomeLogo.propTypes = {
+  onLoad: PropTypes.func
+}
+  

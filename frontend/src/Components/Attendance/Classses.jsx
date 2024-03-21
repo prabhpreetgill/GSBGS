@@ -10,12 +10,15 @@ import {
 import Container from "@mui/material/Container";
 import Students from "./StudentView";
 import PropTypes from "prop-types"; // Import PropTypes for validation
+import TransitionsSnackbar from "../Enroll/Submit";
 
 export default function ClassesContainer({ week }) {
   const [data, setData] = React.useState([]);
   const [open, setOpen] = React.useState(false); // Controls the Dialog (Modal) Open/Close
   const [selectedClass, setSelectedClass] = React.useState("");
   const [selectedClassName, setselectedClassName] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
   const handleClickOpen = React.useCallback((id, name) => {
     setSelectedClass(id);
@@ -54,6 +57,10 @@ export default function ClassesContainer({ week }) {
     });
     return { friday, saturday, sunday };
   }, [data]);
+
+  const triggerSnackbar = () => {
+    setSnackbarOpen(true);
+  };
 
   return (
     <Box>
@@ -240,22 +247,18 @@ export default function ClassesContainer({ week }) {
           {selectedClassName}
         </DialogTitle>
         <DialogContent>
-          <Students url={selectedClass._id} week={week} />
+        <Students url={selectedClass._id} week={week} onClose={handleClose} message={setMessage} snackbar={triggerSnackbar}/>
         </DialogContent>
       </Dialog>
-      {/* <TransitionsSnackbar
+      <TransitionsSnackbar
         open={snackbarOpen}
         setOpen={setSnackbarOpen}
         alert={message}
-      /> */}
+      />
     </Box>
   );
 }
 
 ClassesContainer.propTypes = {
-  week: PropTypes.shape({
-    // Assuming week is an object with specific properties
-    start: PropTypes.string.isRequired, // Example property inside week object
-    end: PropTypes.string.isRequired, // Example property inside week object
-  }),
+  week: PropTypes.number.isRequired,
 };

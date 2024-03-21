@@ -5,3 +5,19 @@
 html{
   background-color: rgba(255, 250, 245, 1);
 }
+
+.hidden {
+  visibility: hidden;
+}
+.fade-in {
+  animation: fadeInAnimation 0.5s forwards;
+  visibility: visible; /* Ensure the visibility changes when the fade-in starts */
+}
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

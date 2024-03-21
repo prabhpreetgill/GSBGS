@@ -13,49 +13,66 @@ import ClassView from "./ClassView";
 import MultiText from "./MultiText";
 import TransitionsSnackbar from "../Enroll/Submit";
 import { useParams } from "react-router-dom";
+import "../../App.css";
 
 export default function SimpleContainer() {
   const [termData, setTermData] = React.useState([]);
   const [students, setStudents] = React.useState([]);
-  const [open, setOpen] = React.useState(false); // Controls the Dialog (Modal) Open/Close
-  const [open1, setOpen1] = React.useState(false); // Controls the Dialog (Modal) Open/Close
+  const [open, setOpen] = React.useState(false);
+  const [open1, setOpen1] = React.useState(false);
   const [selectedClass, setSelectedClass] = React.useState("");
   const [selectedClassName, setselectedClassName] = React.useState("");
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [classData, setClassData] = React.useState([]);
-
-  const handleClickOpen = React.useCallback((id, name) => {
-    setSelectedClass(id);
-    setselectedClassName(name);
-    setOpen(true);
-  }, []);
+  const [change, setChange] = React.useState(false);
 
   const term = useParams();
 
-  const handleClose = () => {
-    setOpen(false);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const termResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/term/${term.termId}`
+        );
+        const termData = await termResponse.json();
+        setTermData(termData?._classes);
+
+        if (termData?._classes) {
+          const classesResponse = await fetch(
+            `https://gsbgs-backend.vercel.app/api/classes`
+          );
+          const classesData = await classesResponse.json();
+          const filteredClasses = classesData.filter((cls) =>
+            termData._classes.includes(cls._id)
+          );
+          setClassData(filteredClasses);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, [term.termId]);
+
+  const handleClickOpen = (id, name) => {
+    setSelectedClass(id);
+    setselectedClassName(name);
+    setOpen(true);
   };
 
-  const handleClickOpen1 = () => {
-    setOpen1(true);
-  };
+  const handleClose = () => setOpen(false);
 
-  const handleClose1 = () => {
-    setOpen1(false);
-  };
+  const handleClickOpen1 = () => setOpen1(true);
 
-  const handleStudentChange = (_, newStudents) => {
-    setStudents(newStudents);
-  };
+  const handleClose1 = () => setOpen1(false);
 
-  const triggerSnackbar = () => {
-    setSnackbarOpen(true);
-  };
+  const handleStudentChange = (_, newStudents) => setStudents(newStudents);
 
-  const setEmpty = () => {
-    setStudents([]);
-  };
+  const triggerSnackbar = () => setSnackbarOpen(true);
+
+  const setEmpty = () => setStudents([]);
 
   const handleSubmit = async () => {
     if (!selectedClass || !students.length) {
@@ -70,17 +87,22 @@ export default function SimpleContainer() {
       ? students.map((student) => student._id)
       : [students._id];
 
-      if (!Array.isArray(termData._students)) {
-        termData._students = [];
-      }
+    if (!Array.isArray(termData._students)) {
+      termData._students = [];
+    }
 
     // Combine existing student IDs with new ones, using Set to remove duplicates
     const updatedStudents = [...termData._students, ...studentIdsToAdd];
     setTermData({ ...termData, _students: updatedStudents });
 
-
     try {
-      // Update the class with new student IDs
+      const classResponse = await fetch(
+        `https://gsbgs-backend.vercel.app/api/classes/${selectedClass._id}`
+      );
+      const classData = await classResponse.json();
+      const updatedStudents = [
+        ...new Set([...classData._students, ...studentIdsToAdd]),
+      ]; // Update the class with new student IDs
       await fetch(
         `https://gsbgs-backend.vercel.app/api/classes/update/${selectedClass._id}`,
         {
@@ -99,7 +121,6 @@ export default function SimpleContainer() {
       const termData = await termResponse.json();
 
       if (!termData._classes.includes(selectedClass._id)) {
-        
         const updatedStudents = [
           ...new Set([...termData._students, ...studentIdsToAdd]),
         ];
@@ -115,6 +136,7 @@ export default function SimpleContainer() {
       }
 
       setMessage(`Added new students to ${selectedClass._name}.`);
+      setChange(!change);
     } catch (error) {
       console.error("Error in operations:", error);
       setMessage(
@@ -126,38 +148,6 @@ export default function SimpleContainer() {
       setOpen1(false); // Close Dialog after Submission
     }
   };
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch term data first since classes filtering depends on it
-        const termResponse = await fetch(
-          `https://gsbgs-backend.vercel.app/api/term/${term.termId}`
-        );
-        const termData = await termResponse.json();
-        setTermData(termData?._classes);
-
-        if (termData?._classes) {
-          // Fetch all classes in parallel as term data is already available
-          const classesResponse = await fetch(
-            `https://gsbgs-backend.vercel.app/api/classes`
-          );
-          const classesData = await classesResponse.json();
-          // Filter classes based on the term data
-          const filteredClasses = classesData.filter((cls) =>
-            termData._classes.includes(cls._id)
-          );
-          setClassData(filteredClasses);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    fetchData();
-  }, [term.termId]); // Depend on term.termId to refetch when it changes
-
-  termData;
 
   const categorizedData = React.useMemo(() => {
     const friday = [];
@@ -194,7 +184,12 @@ export default function SimpleContainer() {
               marginTop: "5%",
             }}
           >
-            <Typography variant="h2" fontWeight={"bold"}>
+            <Typography
+              variant="h2"
+              fontWeight={"bold"}
+              sx={{ animationDelay: "0.1s", opacity: 0 }}
+              className="fade-in"
+            >
               Classes
             </Typography>
             <Box
@@ -212,7 +207,13 @@ export default function SimpleContainer() {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h4">Friday</Typography>
+                <Typography
+                  variant="h4"
+                  sx={{ animationDelay: "0.2s", opacity: 0 }}
+                  className="fade-in"
+                >
+                  Friday
+                </Typography>
                 <Box
                   sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
                 >
@@ -226,6 +227,8 @@ export default function SimpleContainer() {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(115,134,222,0.5)",
+                        animationDelay: `${0.1 * index + 0.4}s`, // Correctly calculate and apply delay
+                        opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
@@ -234,6 +237,7 @@ export default function SimpleContainer() {
                           // You can add more styles here
                         },
                       }}
+                      className="fade-in"
                       onClick={() => handleClickOpen(element, element._name)} // Corrected
                     >
                       <Typography
@@ -254,7 +258,13 @@ export default function SimpleContainer() {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h4">Saturday</Typography>
+                <Typography
+                  variant="h4"
+                  sx={{ opacity: 0, animationDelay: "0.3s" }}
+                  className="fade-in"
+                >
+                  Saturday
+                </Typography>
                 <Box
                   sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
                 >
@@ -268,15 +278,16 @@ export default function SimpleContainer() {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(148,215,202, 0.5)",
+                        animationDelay: `${0.1 * index + 0.5}s`, // Correctly calculate and apply delay
+                        opacity: 0,
                         "&:hover": {
-                          // Styles to apply on hover
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
                           transitionDuration: "0.2s",
                           background: "rgba(148,215,202, 0.3)",
-                          // You can add more styles here
                         },
                       }}
-                      onClick={() => handleClickOpen(element, element._name)} // Corrected
+                      onClick={() => handleClickOpen(element, element._name)}
+                      className="fade-in"
                     >
                       <Typography
                         variant="h6"
@@ -296,7 +307,13 @@ export default function SimpleContainer() {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h4">Sunday</Typography>
+                <Typography
+                  variant="h4"
+                  sx={{ opacity: 0, animationDelay: "0.4s" }}
+                  className="fade-in"
+                >
+                  Sunday
+                </Typography>
                 <Box
                   sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
                 >
@@ -310,6 +327,8 @@ export default function SimpleContainer() {
                         m: 1,
                         borderRadius: "10px",
                         background: "rgba(237, 182, 134, 0.5)",
+                        animationDelay: `${0.1 * index + 0.6}s`, // Correctly calculate and apply delay
+                        opacity: 0,
                         "&:hover": {
                           // Styles to apply on hover
                           boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
@@ -361,7 +380,7 @@ export default function SimpleContainer() {
           {selectedClassName}
         </DialogTitle>
         <DialogContent>
-          {ClassView(selectedClass._id)}
+          {ClassView(selectedClass._id, change)}
           <Dialog
             // fullScreen={fullScreen}
             open={open1}

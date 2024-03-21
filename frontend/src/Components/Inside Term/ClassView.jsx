@@ -2,40 +2,59 @@ import React, { useEffect, useState } from "react";
 import { Typography, Box } from "@mui/material";
 import StudentsAccordian from "./StudentsAccordian";
 
-export default function ClassView(url) {
+export default function ClassView(url, change) {
   const [data, setData] = useState([]);
   const [teacherName, setTeacherName] = useState("");
   const [taName, setTaName] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const fetchClassDetails = async () => {
       if (url) {
+        setIsLoading(true); // Start loading
         try {
-          const classResponse = await fetch(`https://gsbgs-backend.vercel.app/api/classes/${url}`);
+          const classResponse = await fetch(
+            `https://gsbgs-backend.vercel.app/api/classes/${url}`
+          );
           const classData = await classResponse.json();
           setData(classData);
-  
+
           if (classData._teachers && classData._teachers.length > 0) {
-            const teacherResponse = await fetch(`https://gsbgs-backend.vercel.app/api/teacher/${classData._teachers[0]}`);
+            const teacherResponse = await fetch(
+              `https://gsbgs-backend.vercel.app/api/teacher/${classData._teachers[0]}`
+            );
             const teacherData = await teacherResponse.json();
-            setTeacherName(`${teacherData._firstName} ${teacherData._middleName} ${teacherData._lastName}`);
+            setTeacherName(
+              `${teacherData._firstName} ${teacherData._middleName} ${teacherData._lastName}`
+            );
           }
-  
+
           if (classData._TAs && classData._TAs.length > 0) {
-            const taResponse = await fetch(`https://gsbgs-backend.vercel.app/api/ta/${classData._TAs[0]}`);
+            const taResponse = await fetch(
+              `https://gsbgs-backend.vercel.app/api/ta/${classData._TAs[0]}`
+            );
             const taData = await taResponse.json();
-            setTaName(`${taData._firstName} ${taData._middleName} ${taData._lastName}`);
+            setTaName(
+              `${taData._firstName} ${taData._middleName} ${taData._lastName}`
+            );
           }
-  
         } catch (error) {
           console.error("Error:", error);
+        } finally {
+          setIsLoading(false); // End loading
         }
       }
     };
-  
+
     fetchClassDetails();
-  }, [url]); // Only re-run the effect if url changes
-  
+  }, [url, change]); // Include `change` in dependencies if it affects the data fetching
+
+  if (isLoading) {
+    return (
+      <Box sx={{ padding: 2 }}>
+      </Box>
+    );
+  }
 
   // Empty data check
   if (!data || data.length === 0) {
@@ -135,7 +154,7 @@ export default function ClassView(url) {
             alignContent: "center",
           }}
         >
-          <StudentsAccordian url={`classes/${url}`} />
+          <StudentsAccordian url={`classes/${url}`} change={change} />
         </Box>
       </Box>
     </Box>

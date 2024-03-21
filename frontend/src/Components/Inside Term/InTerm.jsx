@@ -16,7 +16,7 @@ function Term() {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
-          width: { xs: "100vw", lg: `calc(100% - ${sidebarWidth})` }, // Width adjusted for sidebar
+          width: { xs: "100vw", sm: `calc(100% + ${sidebarWidth})`, xl: `calc(100% - ${sidebarWidth})` }, // Width adjusted for sidebar
         }}
       >
         {/* Full viewport height container */}

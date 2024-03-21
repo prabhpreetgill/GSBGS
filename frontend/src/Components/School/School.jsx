@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../../App.css"; // Global styles
 import Sidebar from "../Sidebar/Sidebar"; // Sidebar component
-import { Box, Typography } from "@mui/material"; // MUI component for layout0911
+import { Box, Typography } from "@mui/material"; // MUI component for layout
 import Btn from "./Btn";
 import ClassBtn from "./ClassBtn";
 import TeacherBtn from "./TeacherBtn";
@@ -9,21 +9,40 @@ import TaBtn from "./TaBtn";
 
 function Term() {
   const sidebarWidth = "150px"; // Set the width of the sidebar
+  const [showTitle, setShowTitle] = useState(false);
+  const [showStudentBtn, setShowStudentBtn] = useState(false);
+  const [showClassBtn, setShowClassBtn] = useState(false);
+  const [showTeacherBtn, setShowTeacherBtn] = useState(false);
+  const [showTaBtn, setShowTaBtn] = useState(false);
+
+  useEffect(() => {
+    const titleTimer = setTimeout(() => setShowTitle(true), 100); // Show title after 100ms
+    const studentBtnTimer = setTimeout(() => setShowStudentBtn(true), 350); // Show student button after 350ms
+    const classBtnTimer = setTimeout(() => setShowClassBtn(true), 600); // Show class button after 600ms
+    const teacherBtnTimer = setTimeout(() => setShowTeacherBtn(true), 850); // Show teacher button after 850ms
+    const taBtnTimer = setTimeout(() => setShowTaBtn(true), 1100); // Show TA button after 1100ms
+
+    return () => {
+      clearTimeout(titleTimer);
+      clearTimeout(studentBtnTimer);
+      clearTimeout(classBtnTimer);
+      clearTimeout(teacherBtnTimer);
+      clearTimeout(taBtnTimer);
+    };
+  }, []);
 
   return (
     <div className="background">
-      {/* Background styling from App.css */}
       <Box sx={{ height: "100vh" }}>
-        {/* Full viewport height container */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            width: {xs: '100vw' ,lg: `calc(100% - ${sidebarWidth})`}, // Width adjusted for sidebar
-            marginLeft: {xs: '0' ,lg: sidebarWidth}, // Margin to accommodate sidebar
+            width: { xs: "100vw", lg: `calc(100% - ${sidebarWidth})` },
+            marginLeft: { xs: "0", lg: sidebarWidth },
           }}
         >
-          <Sidebar /> {/* Sidebar component */}
+          <Sidebar />
           <Box
             sx={{
               display: "flex",
@@ -31,39 +50,41 @@ function Term() {
               height: "30vh",
               alignItems: "center",
             }}
+            className={showTitle ? "fade-in" : "hidden"}
           >
-              <Typography
-                fontWeight={"bold"}
-                sx={{
-                  fontSize: {xs: '4rem', lg: "5rem"},
-                }}
-              >
-                GSB School
-              </Typography>
+            <Typography
+              fontWeight={"bold"}
+              sx={{
+                fontSize: { xs: "4rem", lg: "5rem" },
+              }}
+            >
+              GSB School
+            </Typography>
           </Box>
           <Box
             sx={{
               display: "flex",
-              flexDirection: {xs:'column', lg: "row"},
+              flexDirection: { xs: "column", lg: "row" },
               justifyContent: "center",
               height: "60vh",
-              alignItems: 'center'
+              alignItems: "center",
             }}
           >
             <Box>
-              <Btn label="Students" delay={250} />
-              <ClassBtn
-                label="Classes"
-              />
+              <Box className={showStudentBtn ? "fade-in" : "hidden"}>
+                <Btn label="Students" delay={250} />
+              </Box>
+              <Box className={showClassBtn ? "fade-in" : "hidden"}>
+                <ClassBtn label="Classes" />
+              </Box>
             </Box>
-            <Box
-       >
-              <TeacherBtn
-                label="Teachers"
-              />
-              <TaBtn
-                label="TA"
-              />
+            <Box>
+              <Box className={showTeacherBtn ? "fade-in" : "hidden"}>
+                <TeacherBtn label="Teachers" />
+              </Box>
+              <Box className={showTaBtn ? "fade-in" : "hidden"}>
+                <TaBtn label="TA" />
+              </Box>
             </Box>
           </Box>
         </Box>

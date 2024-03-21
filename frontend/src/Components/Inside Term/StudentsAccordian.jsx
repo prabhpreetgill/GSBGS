@@ -15,7 +15,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TransitionsSnackbar from "../Enroll/Submit";
 
-export default function AccordionExpandIcon({ url }) {
+export default function AccordionExpandIcon({ url, newstudent}) {
   const [data, setData] = useState([]);
   const [allData, setAllData] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -60,7 +60,7 @@ export default function AccordionExpandIcon({ url }) {
     };
 
     fetchData();
-  }, [url, change]); // Only re-run the effect if url changes
+  }, [url, change, newstudent]); // Only re-run the effect if url changes
 
   const updateClass = async () => {
     if (!selectedStudent) {
@@ -224,4 +224,5 @@ export default function AccordionExpandIcon({ url }) {
 
 AccordionExpandIcon.propTypes = {
   url: PropTypes.string.isRequired,
-};
+  newstudent: PropTypes.bool
+}
