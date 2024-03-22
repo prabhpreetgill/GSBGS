@@ -9,30 +9,39 @@ export default function Login() {
   const handleLogin = async (event) => {
     event.preventDefault();
 
+    // Prepare the data to be sent in the POST request
+    const loginData = {
+      username, // assuming 'username' is the state variable holding the user input
+      password, // assuming 'password' is the state variable holding the user input
+    };
+
     try {
-      const response = await fetch("https://gsbgs-backend.vercel.app/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      // Make the POST request to the login API
+      const response = await fetch(
+        "https://gsbgs-backend.vercel.app/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginData), // send the loginData object as a JSON string
+        }
+      );
 
-      const data = await response.json();
-
+      // Check if the login was successful
       if (response.ok) {
+        const data = await response.json();
         console.log("Login successful:", data);
-        // Handle successful login here (e.g., redirect to another page or set user context)
+        // Handle successful login here (e.g., save token, redirect user, etc.)
       } else {
-        console.error("Login failed:", data.message);
-        // Handle login failure here (e.g., show an error message)
+        // If the response status code is not OK, throw an error with the response status text
+        throw new Error(
+          `Login failed: ${response.status} ${response.statusText}`
+        );
       }
     } catch (error) {
-      console.error("Network error:", error);
-      // Handle network errors here
+      // Handle errors that occur during the fetch or due to a non-OK response
+      console.error(error.message);
     }
   };
 

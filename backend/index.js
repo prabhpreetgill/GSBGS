@@ -742,7 +742,7 @@ async function run() {
 
         // Now that we've ensured user.password should be defined, attempt comparison
         const match = await bcrypt.compare(password, user.password);
-        console.log(match);
+        res.send(match);
         if (match) {
           const token = jwt.sign({ userId: user._id }, secretKey, {
             expiresIn: "1h",
