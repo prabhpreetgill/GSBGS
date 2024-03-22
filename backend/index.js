@@ -741,14 +741,13 @@ async function run() {
 
         // Now that we've ensured user.password should be defined, attempt comparison
         const match = await bcrypt.compare(password, user.password);
-        res.send(match);
         if (match) {
           const token = jwt.sign({ userId: user._id }, secretKey, {
             expiresIn: "1h",
           });
           res.json({ message: "You are now logged in!", token });
         } else {
-          res.status(401).json({ message: "Invalid username or password" });
+          res.status(401).json({ message: "Invalid username or password", match });
         }
       } catch (error) {
         console.error("Error during login:", error);
