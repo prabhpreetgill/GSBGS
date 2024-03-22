@@ -719,33 +719,40 @@ async function run() {
 
     app.post("/api/login", async (req, res) => {
       const { username, password } = req.body;
+
+      // Ensure both username and password are provided
+      if (!username || !password) {
+        return res
+          .status(400)
+          .json({ message: "Username and password are required" });
+      }
+
       const db = await client.db("GSIMS");
       const collection = await db.collection("Users");
 
       try {
         const user = await collection.findOne({ username });
 
-        if (!user) {
+        if (!user || !user.password) {
+          // This also handles the case where user.password might be undefined
           return res
             .status(401)
             .json({ message: "Invalid username or password" });
         }
 
-        // bcrypt.compare to check if the submitted password matches the stored hash
+        // Now that we've ensured user.password should be defined, attempt comparison
         const match = await bcrypt.compare(password, user.password);
         if (match) {
-          // Passwords match, create JWT
           const token = jwt.sign({ userId: user._id }, secretKey, {
             expiresIn: "1h",
           });
-
           res.json({ message: "You are now logged in!", token });
         } else {
           res.status(401).json({ message: "Invalid username or password" });
         }
       } catch (error) {
         console.error("Error during login:", error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Internal server error" });
       }
     });
 
