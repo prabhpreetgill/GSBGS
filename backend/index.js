@@ -733,7 +733,7 @@ async function run() {
       try {
         const user = await collection.findOne({ username });
 
-        if (!user || !user.password) {
+        if (!user.username) {
           // This also handles the case where user.password might be undefined
           return res
             .status(401)
