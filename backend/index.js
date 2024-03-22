@@ -719,35 +719,34 @@ async function run() {
     app.post("/api/login", async (req, res) => {
       const { username, password } = req.body;
 
-      // Ensure both username and password are provided
       if (!username || !password) {
         return res
           .status(400)
           .json({ message: "Username and password are required" });
       }
 
-      const db = await client.db("GSIMS");
-      const collection = await db.collection("Users");
-
       try {
-        const user = await collection.findOne({ username });
+        const db = await client.db("GSIMS");
+        const collection = await db.collection("Users");
+        const userDoc = await collection.findOne({ user: username }); // Use 'user' instead of 'username'
 
-        if (!user || !user.password) {
-          // This also handles the case where user.password might be undefined
+        if (!userDoc) {
           return res
             .status(401)
             .json({ message: "Invalid username or password" });
         }
 
-        // Now that we've ensured user.password should be defined, attempt comparison
-        const match = await bcrypt.compare(password, user.password);
+        const match = await bcrypt.compare(password, userDoc.password); // userDoc.password is the hashed password
+
         if (match) {
-          const token = jwt.sign({ userId: user._id }, secretKey, {
+          const token = jwt.sign({ userId: userDoc._id }, secretKey, {
             expiresIn: "1h",
           });
           res.json({ message: "You are now logged in!", token });
         } else {
-          res.status(401).json({ message: "Invalid username or password", match });
+          return res
+            .status(401)
+            .json({ message: "Invalid username or password" });
         }
       } catch (error) {
         console.error("Error during login:", error);
