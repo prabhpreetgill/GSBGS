@@ -733,13 +733,6 @@ async function run() {
       try {
         const user = await collection.findOne({ username });
 
-        if (!user.username) {
-          // This also handles the case where user.password might be undefined
-          return res
-            .status(401)
-            .json({ message: "Invalid username or password" });
-        }
-
         // Now that we've ensured user.password should be defined, attempt comparison
         const match = await bcrypt.compare(password, user.password);
         res.send(match);
