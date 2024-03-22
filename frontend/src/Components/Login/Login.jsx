@@ -1,10 +1,17 @@
 import * as React from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import "../../App.css";
+import useSignIn from "react-auth-kit/hooks/useSignIn";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+
+  let navigate = useNavigate();
+
+  const signIn = useSignIn();
+  signIn;
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -15,7 +22,6 @@ export default function Login() {
       password, // assuming 'password' is the state variable holding the user input
     };
 
-    console.log(loginData)
     try {
       // Make the POST request to the login API
       const response = await fetch(
@@ -32,10 +38,21 @@ export default function Login() {
       // Check if the login was successful
       if (response.ok) {
         const data = await response.json();
+        // Assuming signIn is synchronous or does not return a Promise
+        signIn({
+          auth: {
+            token: data.token,
+            type: "Bearer",
+            expiresIn: 3600,
+            authState: { user: username },
+          },
+        });
+        // Now directly navigate to home page
+        navigate("/");
         console.log("Login successful:", data);
-        // Handle successful login here (e.g., save token, redirect user, etc.)
+        // No need to call handleNavigation here since navigate is being called directly
       } else {
-        // If the response status code is not OK, throw an error with the response status text
+        // Handle login failure
         throw new Error(
           `Login failed: ${response.status} ${response.statusText}`
         );
@@ -45,7 +62,6 @@ export default function Login() {
       console.error(error.message);
     }
   };
-
 
   return (
     <Box
