@@ -714,7 +714,7 @@ async function run() {
 
     const bcrypt = require("bcrypt");
     const jwt = require("jsonwebtoken");
-    const secretKey = process.env.JWT_SECRET || "your_secret_key"; // Ensure this is secure and not exposed
+    const secretKey = process.env.JWT_SECRET || "prabhsinghji"; // Ensure this is secure and not exposed
     const saltRounds = 10;
 
     app.post("/api/login", async (req, res) => {
@@ -742,6 +742,7 @@ async function run() {
 
         // Now that we've ensured user.password should be defined, attempt comparison
         const match = await bcrypt.compare(password, user.password);
+        console.log(match);
         if (match) {
           const token = jwt.sign({ userId: user._id }, secretKey, {
             expiresIn: "1h",
