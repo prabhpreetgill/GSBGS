@@ -712,9 +712,10 @@ async function run() {
       }
     });
 
-    const bcrypt = require('bcrypt');
+    const bcrypt = require("bcrypt");
     const jwt = require("jsonwebtoken");
     const secretKey = process.env.JWT_SECRET || "your_secret_key"; // Ensure this is secure and not exposed
+    const saltRounds = 10;
 
     app.post("/api/login", async (req, res) => {
       const { username, password } = req.body;
@@ -730,8 +731,8 @@ async function run() {
             .json({ message: "Invalid username or password" });
         }
 
+        // bcrypt.compare to check if the submitted password matches the stored hash
         const match = await bcrypt.compare(password, user.password);
-
         if (match) {
           // Passwords match, create JWT
           const token = jwt.sign({ userId: user._id }, secretKey, {
