@@ -715,7 +715,6 @@ async function run() {
     const bcrypt = require("bcrypt");
     const jwt = require("jsonwebtoken");
     const secretKey = process.env.JWT_SECRET || "prabhsinghji"; // Ensure this is secure and not exposed
-    const saltRounds = 10;
 
     app.post("/api/login", async (req, res) => {
       const { username, password } = req.body;
@@ -732,6 +731,13 @@ async function run() {
 
       try {
         const user = await collection.findOne({ username });
+
+        if (!user || !user.password) {
+          // This also handles the case where user.password might be undefined
+          return res
+            .status(401)
+            .json({ message: "Invalid username or password" });
+        }
 
         // Now that we've ensured user.password should be defined, attempt comparison
         const match = await bcrypt.compare(password, user.password);

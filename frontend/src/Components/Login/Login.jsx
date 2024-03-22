@@ -15,6 +15,7 @@ export default function Login() {
       password, // assuming 'password' is the state variable holding the user input
     };
 
+    console.log(loginData)
     try {
       // Make the POST request to the login API
       const response = await fetch(
@@ -44,6 +45,7 @@ export default function Login() {
       console.error(error.message);
     }
   };
+
 
   return (
     <Box
