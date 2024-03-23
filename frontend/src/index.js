@@ -14,6 +14,7 @@ import Login from "./Components/Login/Login";
 import createStore from "react-auth-kit/createStore";
 import AuthProvider from "react-auth-kit";
 import AuthOutlet from "@auth-kit/react-router/AuthOutlet";
+import Info from "./Components/Info/info";
 
 const store = createStore({
   authName: "_auth",
@@ -37,6 +38,7 @@ root.render(
             <Route path="/term" element={<Term />}></Route>
             <Route path="/term/:termId" element={<InTerm />}></Route>
             <Route path="/school" element={<School />}></Route>
+            <Route path="/info" element={<Info />}></Route>
           </Route>
         </Routes>
       </BrowserRouter>

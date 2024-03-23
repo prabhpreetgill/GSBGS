@@ -29,12 +29,15 @@ function Enroll() {
           marginLeft: { xs: "0", lg: sidebarWidth },
           justifyContent: "center",
           alignItems: "center",
+          marginTop: 5
         }}
       >
         <Box
           sx={{
             display: "flex",
             margin: "25px",
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
           className={isFormVisible ? "fade-in" : "hidden"}
         >

@@ -44,11 +44,11 @@ class Term {
 }
 
 class Classes {
-  constructor(name, day, term, termName, students, teachers, TAs) {
+  constructor(name, day, term, termYear, students, teachers, TAs) {
     this._name = name;
     this._day = day;
     this._term = term;
-    this._termName = termName;
+    this._termYear = termYear;
     this._students = students;
     this._teachers = teachers;
     this._TAs = TAs;

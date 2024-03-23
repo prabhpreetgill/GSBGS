@@ -60,17 +60,23 @@ function AddClass() {
 
       const termData = await termResponse.json();
 
+      const startYear = new Date(termData._start).getFullYear();
+      const endYear = new Date(termData._end).getFullYear();
+
       const newClass = new Classes(
         className._name,
         day,
         termData._id,
-        termData._name,
+        `${startYear} - ${endYear}`,
         [],
         [],
         []
       );
       newClass.assignTeacher(teacher._id);
-      newClass.assignTA(ta._id);
+      if(ta != undefined){
+        newClass.assignTA(ta._id);
+
+      }
 
       // Add the new class
       const classResponse = await fetch(
@@ -115,6 +121,7 @@ function AddClass() {
           body: JSON.stringify({ _classes: updatedClassesForTeacher }),
         }
       );
+
       if (!teacherUpdateResponse.ok)
         throw new Error("Failed to update teacher with new class.");
 

@@ -53,7 +53,7 @@ export default function SimpleContainer() {
     };
 
     fetchData();
-  }, [term.termId]);
+  }, [term.termId, change]);
 
   const handleClickOpen = (id, name) => {
     setSelectedClass(id);
@@ -119,19 +119,46 @@ export default function SimpleContainer() {
       );
       const termData = await termResponse.json();
 
-      if (!termData._classes.includes(selectedClass._id)) {
-        const updatedStudents = [
-          ...new Set([...termData._students, ...studentIdsToAdd]),
-        ];
+      // Check if _students is an array, default to empty array if not
+      const currentStudents = Array.isArray(termData._students)
+        ? termData._students
+        : [];
 
-        await fetch(
-          `https://gsbgs-backend.vercel.app/api/term/update/${term.termId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedStudents),
-          }
+      // Assuming studentIdsToAdd is an array of student IDs to add
+      const updatedTermStudents = [
+        ...new Set([...currentStudents, ...studentIdsToAdd]),
+      ];
+
+      await fetch(
+        `https://gsbgs-backend.vercel.app/api/term/update/${term.termId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _students: updatedTermStudents }),
+        }
+      );
+
+      for (const student of students) {
+        const studentResponse = await fetch(
+          `https://gsbgs-backend.vercel.app/api/students/${student._id}`
         );
+        const studentData = await studentResponse.json();
+
+        // Check if the student's classes already include the selected class
+        const studentClasses = studentData._classes || [];
+        if (!studentClasses.includes(selectedClass._id)) {
+          studentClasses.push(selectedClass._id); // Add the selected class to the student's classes
+
+          // Update the student with the new classes list
+          await fetch(
+            `https://gsbgs-backend.vercel.app/api/students/update/${student._id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ _classes: studentClasses }),
+            }
+          );
+        }
       }
 
       setMessage(`Added new students to ${selectedClass._name}.`);
@@ -162,195 +189,195 @@ export default function SimpleContainer() {
 
   return (
     <Box>
+      <Box
+        sx={{
+          bgcolor: "rgba(255, 255, 252, 1)",
+          height: "80vh",
+          borderRadius: "25px",
+          boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+          display: "flex",
+          width: { xs: "80vw", lg: "75vw" },
+          backgroundPositionY: { xs: "60px", xl: "0" },
+        }}
+      >
         <Box
           sx={{
-            bgcolor: "rgba(255, 255, 252, 1)",
-            height: "80vh",
-            borderRadius: "25px",
-            boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+            marginLeft: "5%",
             display: "flex",
-            width: {xs: '80vw', lg:"75vw"},
-            backgroundPositionY: { xs: "60px", xl: "0" },
+            flexDirection: { xs: "column", md: "column" },
+            marginTop: "5%",
           }}
         >
+          <Typography
+            variant="h2"
+            fontWeight={"bold"}
+            sx={{ animationDelay: "0.1s", opacity: 0 }}
+            className="fade-in"
+          >
+            Classes
+          </Typography>
           <Box
             sx={{
-              marginLeft: "5%",
               display: "flex",
-              flexDirection: { xs: "column", md: "column" },
-              marginTop: "5%",
+              flexDirection: { xs: "column", lg: "row" },
+              width: "80vw",
+              marginTop: "3%",
             }}
           >
-            <Typography
-              variant="h2"
-              fontWeight={"bold"}
-              sx={{ animationDelay: "0.1s", opacity: 0 }}
-              className="fade-in"
-            >
-              Classes
-            </Typography>
             <Box
               sx={{
+                width: { xs: "80vw", lg: "30%" },
                 display: "flex",
-                flexDirection: { xs: "column", lg: "row" },
-                width: "80vw",
-                marginTop: "3%",
+                flexDirection: "column",
               }}
             >
-              <Box
-                sx={{
-                  width: { xs: "80vw", lg: "30%" },
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+              <Typography
+                variant="h4"
+                sx={{ animationDelay: "0.2s", opacity: 0 }}
+                className="fade-in"
               >
-                <Typography
-                  variant="h4"
-                  sx={{ animationDelay: "0.2s", opacity: 0 }}
-                  className="fade-in"
-                >
-                  Friday
-                </Typography>
-                <Box
-                  sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
-                >
-                  {categorizedData.friday.map((element, index) => (
-                    <Button
-                      key={index}
-                      sx={{
-                        width: "80%",
-                        height: "4vh",
-                        border: "2px solid black",
-                        m: 1,
-                        borderRadius: "10px",
-                        background: "rgba(115,134,222,0.5)",
-                        animationDelay: `${0.1 * index + 0.2}s`, // Correctly calculate and apply delay
-                        opacity: 0,
-                        "&:hover": {
-                          // Styles to apply on hover
-                          boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
-                          transitionDuration: "0.2s",
-                          background: "rgba(115,134,222,0.3)",
-                          // You can add more styles here
-                        },
-                      }}
-                      className="fade-in"
-                      onClick={() => handleClickOpen(element, element._name)} // Corrected
+                Friday
+              </Typography>
+              <Box
+                sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
+              >
+                {categorizedData.friday.map((element, index) => (
+                  <Button
+                    key={index}
+                    sx={{
+                      width: "80%",
+                      height: "4vh",
+                      border: "2px solid black",
+                      m: 1,
+                      borderRadius: "10px",
+                      background: "rgba(115,134,222,0.5)",
+                      animationDelay: `${0.1 * index + 0.2}s`, // Correctly calculate and apply delay
+                      opacity: 0,
+                      "&:hover": {
+                        // Styles to apply on hover
+                        boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
+                        transitionDuration: "0.2s",
+                        background: "rgba(115,134,222,0.3)",
+                        // You can add more styles here
+                      },
+                    }}
+                    className="fade-in"
+                    onClick={() => handleClickOpen(element, element._name)} // Corrected
+                  >
+                    <Typography
+                      variant="h6"
+                      color={"black"}
+                      fontWeight={"bold"}
                     >
-                      <Typography
-                        variant="h6"
-                        color={"black"}
-                        fontWeight={"bold"}
-                      >
-                        {element._name}
-                      </Typography>
-                    </Button>
-                  ))}
-                </Box>
+                      {element._name}
+                    </Typography>
+                  </Button>
+                ))}
               </Box>
-              <Box
-                sx={{
-                  width: { xs: "80vw", lg: "30%" },
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+            </Box>
+            <Box
+              sx={{
+                width: { xs: "80vw", lg: "30%" },
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{ opacity: 0, animationDelay: "0.3s" }}
+                className="fade-in"
               >
-                <Typography
-                  variant="h4"
-                  sx={{ opacity: 0, animationDelay: "0.3s" }}
-                  className="fade-in"
-                >
-                  Saturday
-                </Typography>
-                <Box
-                  sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
-                >
-                  {categorizedData.saturday.map((element, index) => (
-                    <Button
-                      key={index}
-                      sx={{
-                        width: "80%",
-                        height: "4vh",
-                        border: "2px solid black",
-                        m: 1,
-                        borderRadius: "10px",
-                        background: "rgba(148,215,202, 0.5)",
-                        animationDelay: `${0.1 * index + 0.3}s`, // Correctly calculate and apply delay
-                        opacity: 0,
-                        "&:hover": {
-                          boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
-                          transitionDuration: "0.2s",
-                          background: "rgba(148,215,202, 0.3)",
-                        },
-                      }}
-                      onClick={() => handleClickOpen(element, element._name)}
-                      className="fade-in"
+                Saturday
+              </Typography>
+              <Box
+                sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
+              >
+                {categorizedData.saturday.map((element, index) => (
+                  <Button
+                    key={index}
+                    sx={{
+                      width: "80%",
+                      height: "4vh",
+                      border: "2px solid black",
+                      m: 1,
+                      borderRadius: "10px",
+                      background: "rgba(148,215,202, 0.5)",
+                      animationDelay: `${0.1 * index + 0.3}s`, // Correctly calculate and apply delay
+                      opacity: 0,
+                      "&:hover": {
+                        boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
+                        transitionDuration: "0.2s",
+                        background: "rgba(148,215,202, 0.3)",
+                      },
+                    }}
+                    onClick={() => handleClickOpen(element, element._name)}
+                    className="fade-in"
+                  >
+                    <Typography
+                      variant="h6"
+                      color={"black"}
+                      fontWeight={"bold"}
                     >
-                      <Typography
-                        variant="h6"
-                        color={"black"}
-                        fontWeight={"bold"}
-                      >
-                        {element._name}
-                      </Typography>
-                    </Button>
-                  ))}
-                </Box>
+                      {element._name}
+                    </Typography>
+                  </Button>
+                ))}
               </Box>
-              <Box
-                sx={{
-                  width: { xs: "80vw", lg: "30%" },
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+            </Box>
+            <Box
+              sx={{
+                width: { xs: "80vw", lg: "30%" },
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{ opacity: 0, animationDelay: "0.4s" }}
+                className="fade-in"
               >
-                <Typography
-                  variant="h4"
-                  sx={{ opacity: 0, animationDelay: "0.4s" }}
-                  className="fade-in"
-                >
-                  Sunday
-                </Typography>
-                <Box
-                  sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
-                >
-                  {categorizedData.sunday.map((element, index) => (
-                    <Button
-                      key={index}
-                      sx={{
-                        width: "80%",
-                        height: "4vh",
-                        border: "2px solid black",
-                        m: 1,
-                        borderRadius: "10px",
-                        background: "rgba(237, 182, 134, 0.5)",
-                        animationDelay: `${0.1 * index + 0.4}s`, // Correctly calculate and apply delay
-                        opacity: 0,
-                        "&:hover": {
-                          // Styles to apply on hover
-                          boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
-                          transitionDuration: "0.2s",
-                          background: "rgba(237, 182, 134, 0.3)",
-                          // You can add more styles here
-                        },
-                      }}
-                      onClick={() => handleClickOpen(element, element._name)} // Corrected
-                      className="fade-in"
+                Sunday
+              </Typography>
+              <Box
+                sx={{ overflow: "auto", height: { xs: "auto", lg: "50vh" } }}
+              >
+                {categorizedData.sunday.map((element, index) => (
+                  <Button
+                    key={index}
+                    sx={{
+                      width: "80%",
+                      height: "4vh",
+                      border: "2px solid black",
+                      m: 1,
+                      borderRadius: "10px",
+                      background: "rgba(237, 182, 134, 0.5)",
+                      animationDelay: `${0.1 * index + 0.4}s`, // Correctly calculate and apply delay
+                      opacity: 0,
+                      "&:hover": {
+                        // Styles to apply on hover
+                        boxShadow: "rgba(0, 0, 0, 0.45) 0px 3px 3px",
+                        transitionDuration: "0.2s",
+                        background: "rgba(237, 182, 134, 0.3)",
+                        // You can add more styles here
+                      },
+                    }}
+                    onClick={() => handleClickOpen(element, element._name)} // Corrected
+                    className="fade-in"
+                  >
+                    <Typography
+                      variant="h6"
+                      color={"black"}
+                      fontWeight={"bold"}
                     >
-                      <Typography
-                        variant="h6"
-                        color={"black"}
-                        fontWeight={"bold"}
-                      >
-                        {element._name}
-                      </Typography>
-                    </Button>
-                  ))}
-                </Box>
+                      {element._name}
+                    </Typography>
+                  </Button>
+                ))}
               </Box>
             </Box>
           </Box>
         </Box>
+      </Box>
       <Dialog
         // fullScreen={fullScreen}
         open={open}

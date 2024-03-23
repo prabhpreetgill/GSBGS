@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box, Typography, Container } from "@mui/material";
-import axios from 'axios';
 
 export default function SimpleContainer() {
   const [data, setData] = useState([]);
@@ -10,27 +9,24 @@ export default function SimpleContainer() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://gsbgs-backend.vercel.app/api/students");
-        setData(response.data);
-        setIsDataLoaded(true); // Set to true once data is loaded
-      } catch (error) {
-        console.error("Error:", error);
-        setIsDataLoaded(false); // In case of error, ensure it's set to false
-      }
-    };
-
-    fetchData();
-  }, []); // Empty dependency array to fetch data only on component mount
+    fetch("https://gsbgs-backend.vercel.app/api/term")
+      .then((response) => response.json())
+      .then((data) => {
+        const today = new Date();
+        const current = data.filter((term) => new Date(term._end) >= today);
+        setData(current);
+        setIsDataLoaded(true);
+      })
+      .catch((error) => console.error("Error:", error));
+  }, []);
 
   useEffect(() => {
-    if (isDataLoaded) {
+    if (isDataLoaded && data[0] != undefined) {
       // Assuming 'data' is an array
-      setTargetNum(data.length);
+      setTargetNum(data[0]._students?.length);
     }
   }, [isDataLoaded, data]); // Depend on isDataLoaded and data
-  
+
   useEffect(() => {
     let interval;
     if (isDataLoaded && num < targetNum) {
@@ -51,7 +47,7 @@ export default function SimpleContainer() {
         <Box
           sx={{
             bgcolor: "rgba(255, 255, 252, 1)",
-            height: {xs: '20vh', lg: "30vh"},
+            height: { xs: "20vh", lg: "30vh" },
             borderRadius: "25px",
             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
             display: "flex",
@@ -59,26 +55,29 @@ export default function SimpleContainer() {
             backgroundImage: `url(https://www.creativefabrica.com/wp-content/uploads/2023/02/18/Abstract-pastel-color-background-design-Graphics-61598166-1.jpg)`,
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
-            width: {xs: "80vw", lg: "40vw"},
-            justifyContent: 'center'
+            width: { xs: "80vw", lg: "40vw" },
+            justifyContent: "center",
           }}
         >
           <Box
             sx={{
               display: "flex",
-              flexDirection: 'column',
+              flexDirection: "column",
             }}
           >
-              <Typography fontWeight={"bold"} sx={{fontSize: {xs: '1.7rem', lg: '3rem'}}}>
-                Number of Students:
-              </Typography>
-              <Typography
-                variant="h1"
-                textAlign={"center"}
-                sx={{fontSize: {xs: '4rem', lg: '5rem'}} }
-              >
-                {num}
-              </Typography>
+            <Typography
+              fontWeight={"bold"}
+              sx={{ fontSize: { xs: "1.7rem", lg: "3rem" } }}
+            >
+              Number of Students:
+            </Typography>
+            <Typography
+              variant="h1"
+              textAlign={"center"}
+              sx={{ fontSize: { xs: "4rem", lg: "5rem" } }}
+            >
+              {num}
+            </Typography>
           </Box>
         </Box>
       </Container>

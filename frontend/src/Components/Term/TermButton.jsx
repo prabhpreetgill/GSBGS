@@ -105,7 +105,7 @@ function CurrentTerm() {
                   fontWeight="bold"
                   sx={{
                     textShadow: "0px 4px 7px rgba(89, 89, 89, 1)",
-                    fontSize: { xs: "1.8rem", lg: "3rem" },
+                    fontSize: { xs: "1.5rem", lg: "3rem" },
                   }}
                 >
                   {currentTerms[0]._name}
@@ -185,7 +185,7 @@ function CurrentTerm() {
                       fontWeight="bold"
                       sx={{
                         textShadow: "0px 4px 7px rgba(89, 89, 89, 1)",
-                        fontSize: { xs: "1.8rem", lg: "3rem" },
+                        fontSize: { xs: "1.5rem", lg: "3rem" },
                       }}
                     >
                       {term._name}

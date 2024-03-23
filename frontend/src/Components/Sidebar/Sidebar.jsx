@@ -64,6 +64,7 @@ export default function PermanentDrawerLeft() {
           { name: "Finance", url: "/finance" },
           { name: "Term", url: "/term" },
           { name: "School", url: "/school" },
+          { name: "Info", url: "/info" },
         ].map((item) => (
           <ListItem
             key={item.name}
@@ -108,7 +109,14 @@ export default function PermanentDrawerLeft() {
           aria-label="open drawer"
           edge="start"
           onClick={handleDrawerToggle}
-          sx={{ marginLeft: 1, display: { lg: "none" } }}
+          sx={{
+            marginLeft: 1,
+            display: { lg: "none" },
+            position: "fixed", // This positions the IconButton relative to the viewport
+            top: 0, // Aligns the top edge of the IconButton with the top of the viewport
+            zIndex: 1100, // Ensures it stays above most other content
+            backgroundColor: "rgba(255, 255, 255, 0.7)", // Optional, for visibility
+          }}
         >
           <MenuIcon sx={{ fontSize: 40 }} />
         </IconButton>

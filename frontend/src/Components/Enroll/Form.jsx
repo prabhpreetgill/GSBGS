@@ -1,7 +1,6 @@
 import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box, Typography, Divider } from "@mui/material";
-import Container from "@mui/material/Container";
 import Text from "./Text";
 import Dropdown from "./Dropdown";
 import Button from "@mui/material/Button";
@@ -95,9 +94,6 @@ export default function SimpleContainer() {
   return (
     <Box>
       <CssBaseline />
-      <Container
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-      >
           <Box sx={containerStyle}>
               <Typography variant="h4" sx={titleStyle}>
                 Personal
@@ -184,7 +180,6 @@ export default function SimpleContainer() {
                 </Button>
             </Box>
           </Box>
-      </Container>
       <TransitionsSnackbar
         open={snackbarOpen}
         setOpen={setSnackbarOpen}

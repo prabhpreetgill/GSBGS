@@ -8,6 +8,7 @@ import AddClass from "./Add";
 function Term() {
   const sidebarWidth = "150px"; // Set the width of the sidebar
 
+
   return (
     <div className="background">
       {/* Background styling from App.css */}
